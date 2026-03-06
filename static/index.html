@@ -410,9 +410,6 @@
     <div class="header-divider"></div>
     <div class="header-badge"><div class="badge-dot"></div>Models loaded</div>
   </div>
-  <div>
-    <span class="header-model-tag">ai4bharat/indic-conformer-600m &nbsp;&bull;&nbsp; Llama-3.2-3B-Instruct</span>
-  </div>
 </header>
 
 <!-- ─── Layout ───────────────────────────────────────────── -->
@@ -451,27 +448,6 @@
         <div class="file-badge" id="fileBadge">
           <span>&#128196;</span>
           <span class="fname" id="fileName"></span>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel-section">
-      <div class="section-heading">Pipeline</div>
-      <div class="model-list">
-        <div class="model-row">
-          <div class="model-dot" style="background:#6366F1;"></div>
-          <div class="model-name">diarizen-wavlm-large-s80</div>
-          <div class="model-role">Diar</div>
-        </div>
-        <div class="model-row">
-          <div class="model-dot" style="background:#0891B2;"></div>
-          <div class="model-name">indic-conformer-600m</div>
-          <div class="model-role">ASR</div>
-        </div>
-        <div class="model-row">
-          <div class="model-dot" style="background:#7C3AED;"></div>
-          <div class="model-name">Llama-3.2-3B-Instruct</div>
-          <div class="model-role">LLM</div>
         </div>
       </div>
     </div>
@@ -641,11 +617,6 @@ function unlockTab(name) {
     t.addEventListener('click', () => switchGTab(t.dataset.gtab));
   }
 }
-
-// ─── Request mic permission on page load ──────────────────
-navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-  .then(stream => stream.getTracks().forEach(t => t.stop()))
-  .catch(() => {}); // silently ignore — user can still grant when they click record
 
 // ─── Input tab switching ──────────────────────────────────
 document.querySelectorAll('.itab').forEach(t =>
@@ -910,7 +881,6 @@ function renderSummary(text) {
     <div class="sum-card">
       <div class="sum-card-hdr">
         <div class="sum-card-title">Conversation Summary</div>
-        <div class="sum-model-tag">meta-llama/Llama-3.2-3B-Instruct</div>
       </div>
       <div class="sum-body">${esc(text)}</div>
       <div class="sum-footer">
