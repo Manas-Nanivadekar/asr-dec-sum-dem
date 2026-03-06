@@ -1754,18 +1754,18 @@
         const wc = summaryText.trim().split(/\s+/).filter(Boolean).length;
         const medicalBlocks = isMedical
           ? `
-      <div class="sum-body" style="margin-top:12px;"><strong>Doctor Guidance</strong><br>${esc(doctorAdviceText)}</div>
-      <div class="sum-body" style="margin-top:12px;"><strong>Clinical Observations</strong><br>${esc(clinicalIndicatorsText)}</div>`
+      <div class="sum-body" style="margin-top:12px;"><strong>Clinical Observations</strong><br>${esc(clinicalIndicatorsText)}</div>
+      <div class="sum-body" style="margin-top:12px;"><strong>Doctor Guidance</strong><br>${esc(doctorAdviceText)}</div>`
           : "";
         document.getElementById("sumLoading").style.display = "none";
         document.getElementById("sumContent").style.display = "block";
         document.getElementById("sumContent").innerHTML = `
     <div class="sum-card">
       <div class="sum-card-hdr"><div class="sum-card-title">Conversation Summary</div></div>
-      <div class="sum-body"><strong>Summary</strong><br>${esc(summaryText)}</div>
       <div class="sum-body" style="margin-top:12px;"><strong>Key Topics</strong><br>${esc(topicText)}</div>
-      <div class="sum-body" style="margin-top:12px;"><strong>Conclusion</strong><br>${esc(conclusionText)}</div>
       ${medicalBlocks}
+      <div class="sum-body" style="margin-top:12px;"><strong>Summary</strong><br>${esc(summaryText)}</div>
+      <div class="sum-body" style="margin-top:12px;"><strong>Conclusion</strong><br>${esc(conclusionText)}</div>
       <div class="sum-footer"><span>${wc} words</span><span>Generated ${new Date().toLocaleTimeString()}</span></div>
     </div>`;
       }
