@@ -103,6 +103,14 @@
         height: 86px;
         position: relative;
       }
+      .leap-network-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 4;
+      }
       .leap-logo-img {
         width: 100%;
         height: 100%;
@@ -111,58 +119,6 @@
         object-position: center center;
         position: relative;
         z-index: 3;
-      }
-      .leap-orbit-dot {
-        position: absolute;
-        left: var(--x);
-        top: var(--y);
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: #7cc0ff;
-        box-shadow:
-          0 0 0 1.5px rgba(255, 255, 255, 0.92),
-          0 0 14px rgba(59, 130, 246, 0.6);
-        z-index: 4;
-        transform: translate(-50%, -50%);
-        animation:
-          leap-dot-orbit 2.2s ease-in-out infinite,
-          leap-dot-pulse 1.2s ease-in-out infinite;
-        animation-delay: var(--delay, 0s);
-        pointer-events: none;
-      }
-      @keyframes leap-dot-orbit {
-        0%,
-        100% {
-          transform: translate(-50%, -50%) translate(0, 0) scale(1);
-        }
-        25% {
-          transform: translate(-50%, -50%)
-            translate(calc(var(--dx) * 0.7), calc(var(--dy) * 0.7)) scale(1.08);
-        }
-        50% {
-          transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0.9);
-        }
-        75% {
-          transform: translate(-50%, -50%)
-            translate(calc(var(--dx) * -0.6), calc(var(--dy) * 0.55))
-            scale(1.06);
-        }
-      }
-      @keyframes leap-dot-pulse {
-        0%,
-        100% {
-          opacity: 0.85;
-          box-shadow:
-            0 0 0 1.5px rgba(255, 255, 255, 0.92),
-            0 0 10px rgba(59, 130, 246, 0.45);
-        }
-        50% {
-          opacity: 1;
-          box-shadow:
-            0 0 0 1.5px rgba(255, 255, 255, 0.96),
-            0 0 18px rgba(59, 130, 246, 0.75);
-        }
       }
       .openday-badge {
         display: flex;
@@ -201,17 +157,13 @@
           object-fit: cover;
           object-position: center center;
         }
-        .leap-orbit-dot {
-          width: 8px;
-          height: 8px;
-        }
         .openday-badge {
           display: none;
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        .leap-orbit-dot {
-          animation: none;
+        .leap-network-canvas {
+          display: none;
         }
       }
 
@@ -930,26 +882,7 @@
       </div>
       <div class="identity-right">
         <div class="logo-frame leap-logo-frame">
-          <span
-            class="leap-orbit-dot"
-            style="--x: 16%; --y: 30%; --dx: -5.6px; --dy: 4.8px; --delay: 0s"
-            aria-hidden="true"
-          ></span>
-          <span
-            class="leap-orbit-dot"
-            style="--x: 39%; --y: 11%; --dx: 6.4px; --dy: -5.2px; --delay: 0.35s"
-            aria-hidden="true"
-          ></span>
-          <span
-            class="leap-orbit-dot"
-            style="--x: 82%; --y: 54%; --dx: 6px; --dy: 5.1px; --delay: 0.75s"
-            aria-hidden="true"
-          ></span>
-          <span
-            class="leap-orbit-dot"
-            style="--x: 54%; --y: 81%; --dx: -5.8px; --dy: 5.4px; --delay: 1.1s"
-            aria-hidden="true"
-          ></span>
+          <canvas class="leap-network-canvas" id="leapNetworkCanvas"></canvas>
           <img class="leap-logo-img" src="/assets/leap-1.png" alt="LEAP Lab" />
         </div>
         <div class="openday-badge">Open Day <span>2026</span></div>
@@ -1152,6 +1085,93 @@
       let audioChunks = [],
         timerSecs = 0,
         timerID = null;
+
+      initLeapNetwork();
+
+      function initLeapNetwork() {
+        const canvas = document.getElementById("leapNetworkCanvas");
+        const frame = canvas?.closest(".leap-logo-frame");
+        if (!canvas || !frame) return;
+        if (
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
+          return;
+        }
+
+        const ctx = canvas.getContext("2d");
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const nodes = [
+          // Anchored to the four existing LEAP node locations.
+          { ax: 0.16, ay: 0.3, rx: 4.2, ry: 3.6, speed: 1.2, phase: 0.1 },
+          { ax: 0.39, ay: 0.11, rx: 4.6, ry: 3.9, speed: 1.05, phase: 1.2 },
+          { ax: 0.82, ay: 0.54, rx: 4.1, ry: 4.4, speed: 1.25, phase: 2.1 },
+          { ax: 0.54, ay: 0.81, rx: 4.7, ry: 4.1, speed: 1.1, phase: 2.8 },
+        ];
+        const edges = [
+          [0, 1],
+          [1, 2],
+          [1, 3],
+          [3, 2],
+        ];
+        let width = 0;
+        let height = 0;
+        let raf = 0;
+        let t0 = performance.now();
+
+        function resize() {
+          width = frame.clientWidth;
+          height = frame.clientHeight;
+          canvas.width = Math.max(1, Math.floor(width * dpr));
+          canvas.height = Math.max(1, Math.floor(height * dpr));
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function draw(ts) {
+          const t = (ts - t0) / 1000;
+          ctx.clearRect(0, 0, width, height);
+
+          const live = nodes.map((n) => ({
+            x: n.ax * width + Math.sin(t * n.speed + n.phase) * n.rx,
+            y:
+              n.ay * height +
+              Math.cos(t * n.speed * 0.92 + n.phase * 1.1) * n.ry,
+          }));
+
+          ctx.lineWidth = 1.8;
+          ctx.strokeStyle = "rgba(96, 165, 250, 0.82)";
+          for (const [i, j] of edges) {
+            ctx.beginPath();
+            ctx.moveTo(live[i].x, live[i].y);
+            ctx.lineTo(live[j].x, live[j].y);
+            ctx.stroke();
+          }
+
+          for (const p of live) {
+            ctx.fillStyle = "rgba(125, 211, 252, 0.98)";
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 4.6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 4.6, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+
+          raf = requestAnimationFrame(draw);
+        }
+
+        resize();
+        raf = requestAnimationFrame(draw);
+        window.addEventListener("resize", () => {
+          cancelAnimationFrame(raf);
+          resize();
+          t0 = performance.now();
+          raf = requestAnimationFrame(draw);
+        });
+      }
 
       // ── Load script ───────────────────────────────────────────
       (async () => {
