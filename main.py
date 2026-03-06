@@ -213,13 +213,32 @@ _SUMMARIZE_SYSTEM = (
 )
 
 _MAX_TRANSCRIPT_CHARS = 4000  # ~1 000 tokens of source text
-_SUMMARY_TAGS = ("SUMMARY", "TOPIC", "CONCLUSION")
+_SUMMARY_TAGS = (
+    "SUMMARY",
+    "TOPIC",
+    "CONCLUSION",
+    "DOMAIN",
+    "DOCTOR_ADVICE",
+    "CLINICAL_INDICATORS",
+)
 _SUMMARY_TEMPLATE = (
     "Transcript:\n\n{transcript}\n\n"
-    "Return exactly this structure and nothing else:\n"
+    "Task:\n"
+    "1) Decide if this is a medical/clinical conversation.\n"
+    "2) Always provide SUMMARY, TOPIC, and CONCLUSION.\n"
+    "3) If and only if medical, also provide DOCTOR_ADVICE and CLINICAL_INDICATORS.\n\n"
+    "Rules:\n"
+    "- DOMAIN must be either MEDICAL or GENERAL.\n"
+    "- If DOMAIN is GENERAL, set DOCTOR_ADVICE to NA and CLINICAL_INDICATORS to NA.\n"
+    "- CLINICAL_INDICATORS should include vital signs/lab values/measurements when present (BP, sugar, SPO2, etc.), else NA.\n"
+    "- Output only the tags below, nothing else.\n\n"
+    "Return exactly this structure:\n"
     "<SUMMARY>One concise paragraph summary.</SUMMARY>\n"
     "<TOPIC>Comma-separated key topics.</TOPIC>\n"
-    "<CONCLUSION>Main outcome/actionable conclusion.</CONCLUSION>"
+    "<CONCLUSION>Main outcome/actionable conclusion.</CONCLUSION>\n"
+    "<DOMAIN>MEDICAL or GENERAL</DOMAIN>\n"
+    "<DOCTOR_ADVICE>Doctor's advice if medical, else NA</DOCTOR_ADVICE>\n"
+    "<CLINICAL_INDICATORS>Clinical measurements/findings if medical and present, else NA</CLINICAL_INDICATORS>"
 )
 
 
@@ -238,6 +257,15 @@ def _clean_structured_summary(raw_text: str) -> tuple[str, dict[str, str]]:
         sections["SUMMARY"] = cleaned
     sections["TOPIC"] = sections["TOPIC"] or "NA"
     sections["CONCLUSION"] = sections["CONCLUSION"] or "NA"
+    domain = (sections["DOMAIN"] or "").strip().upper()
+    sections["DOMAIN"] = "MEDICAL" if domain == "MEDICAL" else "GENERAL"
+
+    if sections["DOMAIN"] == "MEDICAL":
+        sections["DOCTOR_ADVICE"] = sections["DOCTOR_ADVICE"] or "NA"
+        sections["CLINICAL_INDICATORS"] = sections["CLINICAL_INDICATORS"] or "NA"
+    else:
+        sections["DOCTOR_ADVICE"] = "NA"
+        sections["CLINICAL_INDICATORS"] = "NA"
 
     tagged = "\n".join(
         f"<{tag}>{sections[tag]}</{tag}>"
