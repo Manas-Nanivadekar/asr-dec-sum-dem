@@ -111,43 +111,51 @@
         object-position: center center;
         position: relative;
         z-index: 2;
+        animation: leap-logo-drift 3.2s ease-in-out infinite;
       }
-      .leap-dot {
+      .leap-logo-frame::after {
+        content: "";
         position: absolute;
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #60a5fa;
-        left: -14px;
-        top: 50%;
+        inset: 0;
+        background: linear-gradient(
+          105deg,
+          rgba(255, 255, 255, 0) 30%,
+          rgba(147, 197, 253, 0.28) 47%,
+          rgba(255, 255, 255, 0) 64%
+        );
+        transform: translateX(-115%);
+        animation: leap-logo-shine 3.2s ease-in-out infinite;
         z-index: 3;
-        opacity: 0;
-        animation: leap-dot-fly 2.2s linear infinite;
+        pointer-events: none;
       }
-      .leap-dot.d1 {
-        animation-delay: 0s;
-      }
-      .leap-dot.d2 {
-        animation-delay: 0.6s;
-      }
-      .leap-dot.d3 {
-        animation-delay: 1.2s;
-      }
-      @keyframes leap-dot-fly {
-        0% {
-          transform: translate(-8px, -10px) scale(0.6);
-          opacity: 0;
+      @keyframes leap-logo-drift {
+        0%,
+        100% {
+          transform: translateX(0) scale(1);
+          filter: drop-shadow(0 0 0 rgba(37, 99, 235, 0));
         }
-        15% {
-          opacity: 0.95;
+        35% {
+          transform: translateX(1.5px) scale(1.01);
+          filter: drop-shadow(0 1px 2px rgba(37, 99, 235, 0.2));
         }
         65% {
-          transform: translate(146px, -2px) scale(1);
-          opacity: 0.95;
+          transform: translateX(-1px) scale(1.005);
+          filter: drop-shadow(0 1px 2px rgba(37, 99, 235, 0.14));
         }
+      }
+      @keyframes leap-logo-shine {
+        0%,
+        55%,
         100% {
-          transform: translate(210px, 8px) scale(0.7);
+          transform: translateX(-115%);
           opacity: 0;
+        }
+        65% {
+          opacity: 1;
+        }
+        85% {
+          transform: translateX(115%);
+          opacity: 0.65;
         }
       }
       .openday-badge {
@@ -187,18 +195,14 @@
           object-fit: cover;
           object-position: center center;
         }
-        .leap-dot {
-          width: 6px;
-          height: 6px;
-        }
         .openday-badge {
           display: none;
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        .leap-dot {
+        .leap-logo-img,
+        .leap-logo-frame::after {
           animation: none;
-          opacity: 0;
         }
       }
 
@@ -917,9 +921,6 @@
       </div>
       <div class="identity-right">
         <div class="logo-frame leap-logo-frame">
-          <span class="leap-dot d1" aria-hidden="true"></span>
-          <span class="leap-dot d2" aria-hidden="true"></span>
-          <span class="leap-dot d3" aria-hidden="true"></span>
           <img class="leap-logo-img" src="/assets/leap-1.png" alt="LEAP Lab" />
         </div>
         <div class="openday-badge">Open Day <span>2026</span></div>
