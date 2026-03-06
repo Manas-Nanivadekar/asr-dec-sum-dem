@@ -79,7 +79,7 @@ class DiCoIndicPipeline:
 
             # Transcribe using model directly
             with torch.no_grad():
-                transcription = self.model(waveform, "hi", "rnnt")
+                transcription = self.asr_model(waveform, "hi", "rnnt")
 
             transcription_text = (
                 transcription[0]
