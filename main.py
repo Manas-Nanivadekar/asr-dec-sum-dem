@@ -29,6 +29,7 @@ SUMMARIZATION_CONFIG = {
     },
     "model": {
         "name": "openai/gpt-oss-20b",
+        "fallback_name": "Qwen/Qwen2.5-7B-Instruct",
         "torch_dtype": "auto",
         "device": "cuda",
         "device_map": "auto",
@@ -185,25 +186,44 @@ if not _sum_model_token:
     if cfg_token and "Paste-Your-HF-Token" not in cfg_token:
         _sum_model_token = cfg_token
 
-sum_tokenizer = AutoTokenizer.from_pretrained(
-    SUMMARIZATION_CONFIG["model"]["name"],
-    token=_sum_model_token,
-)
-_sum_model_kwargs = {
-    "token": _sum_model_token,
-    "torch_dtype": SUMMARIZATION_CONFIG["model"]["torch_dtype"],
-    "low_cpu_mem_usage": SUMMARIZATION_CONFIG["model"]["low_cpu_mem_usage"],
-}
-if torch.cuda.is_available():
-    _sum_model_kwargs["device_map"] = SUMMARIZATION_CONFIG["model"]["device_map"]
+def _load_summarization_stack(model_name: str, token: str | None):
+    tokenizer = AutoTokenizer.from_pretrained(model_name, token=token)
+    kwargs = {
+        "token": token,
+        "torch_dtype": SUMMARIZATION_CONFIG["model"]["torch_dtype"],
+        "low_cpu_mem_usage": SUMMARIZATION_CONFIG["model"]["low_cpu_mem_usage"],
+    }
+    if torch.cuda.is_available():
+        kwargs["device_map"] = SUMMARIZATION_CONFIG["model"]["device_map"]
+    model = AutoModelForCausalLM.from_pretrained(model_name, **kwargs)
+    return tokenizer, model
 
-sum_model = AutoModelForCausalLM.from_pretrained(
-    SUMMARIZATION_CONFIG["model"]["name"],
-    **_sum_model_kwargs,
-)
+
+try:
+    sum_tokenizer, sum_model = _load_summarization_stack(
+        SUMMARIZATION_CONFIG["model"]["name"],
+        _sum_model_token,
+    )
+except Exception as e:
+    err = str(e)
+    fallback_name = SUMMARIZATION_CONFIG["model"].get("fallback_name")
+    if fallback_name and ("torch.accelerator" in err or "quantizer_mxfp4" in err):
+        print(
+            "GPT-OSS load failed due to local torch/transformers compatibility "
+            f"({err}). Falling back to {fallback_name}."
+        )
+        sum_tokenizer, sum_model = _load_summarization_stack(
+            fallback_name,
+            _sum_model_token,
+        )
+        SUMMARIZATION_CONFIG["model"]["active_name"] = fallback_name
+    else:
+        raise
+
 sum_model.eval()
 
-print("Summarization model ready.")
+active_name = SUMMARIZATION_CONFIG["model"].get("active_name", SUMMARIZATION_CONFIG["model"]["name"])
+print(f"Summarization model ready: {active_name}")
 
 _SUMMARIZE_SYSTEM = (
     "You are a transcript summarization assistant. "
