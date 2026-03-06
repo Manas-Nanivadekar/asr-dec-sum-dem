@@ -103,22 +103,27 @@
         height: 86px;
         position: relative;
       }
-      .leap-network-canvas {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 4;
-      }
-      .leap-logo-img {
+      .leap-logo-svg {
         width: 100%;
         height: 100%;
         display: block;
-        object-fit: cover;
-        object-position: center center;
-        position: relative;
-        z-index: 3;
+        overflow: visible;
+      }
+      .leap-text {
+        fill: url(#leapTextGradient);
+        filter: drop-shadow(0 4px 8px rgba(18, 59, 94, 0.16));
+      }
+      .leap-node-line {
+        stroke: url(#leapLineGradient);
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        opacity: 0.7;
+      }
+      .leap-node-circle {
+        fill: #5bc0ff;
+        stroke: #ffffff;
+        stroke-width: 1.8;
+        filter: drop-shadow(0 0 8px rgba(91, 192, 255, 0.65));
       }
       .openday-badge {
         display: flex;
@@ -153,16 +158,7 @@
           object-position: center center;
           padding: 3px 4px;
         }
-        .leap-logo-img {
-          object-fit: cover;
-          object-position: center center;
-        }
         .openday-badge {
-          display: none;
-        }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .leap-network-canvas {
           display: none;
         }
       }
@@ -882,8 +878,52 @@
       </div>
       <div class="identity-right">
         <div class="logo-frame leap-logo-frame">
-          <canvas class="leap-network-canvas" id="leapNetworkCanvas"></canvas>
-          <img class="leap-logo-img" src="/assets/leap-1.png" alt="LEAP Lab" />
+          <svg
+            id="leapLogoSvg"
+            class="leap-logo-svg"
+            viewBox="0 0 340 180"
+            xmlns="http://www.w3.org/2000/svg"
+            role="img"
+            aria-label="LEAP Lab"
+          >
+            <defs>
+              <linearGradient
+                id="leapTextGradient"
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="100%"
+              >
+                <stop offset="0%" stop-color="#2b7ec9" />
+                <stop offset="50%" stop-color="#1d5c96" />
+                <stop offset="100%" stop-color="#11365c" />
+              </linearGradient>
+              <linearGradient id="leapLineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(91, 192, 255, 0.25)" />
+                <stop offset="50%" stop-color="rgba(91, 192, 255, 0.95)" />
+                <stop offset="100%" stop-color="rgba(91, 192, 255, 0.25)" />
+              </linearGradient>
+            </defs>
+
+            <g id="leapLinesGroup"></g>
+
+            <path class="leap-text" d="M 80,70 v 50 h 35 v -10 h -25 v -40 z" />
+            <path
+              class="leap-text"
+              d="M 130,70 h 35 v 10 h -25 v 10 h 20 v 10 h -20 v 10 h 25 v 10 h -35 z"
+            />
+            <path
+              class="leap-text"
+              d="M 180,120 L 195,70 L 205,70 L 220,120 L 208,120 L 200,90 L 192,120 Z"
+            />
+            <path
+              class="leap-text"
+              fill-rule="evenodd"
+              d="M 235,70 h 20 a 15,15 0 0 1 15,15 a 15,15 0 0 1 -15,15 h -10 v 20 h -10 Z M 245,80 h 10 a 5,5 0 0 1 5,5 a 5,5 0 0 1 -5,5 h -10 Z"
+            />
+
+            <g id="leapNodesGroup"></g>
+          </svg>
         </div>
         <div class="openday-badge">Open Day <span>2026</span></div>
       </div>
@@ -1086,91 +1126,220 @@
         timerSecs = 0,
         timerID = null;
 
-      initLeapNetwork();
+      initLeapLogoMotion();
 
-      function initLeapNetwork() {
-        const canvas = document.getElementById("leapNetworkCanvas");
-        const frame = canvas?.closest(".leap-logo-frame");
-        if (!canvas || !frame) return;
-        if (
+      function initLeapLogoMotion() {
+        const svg = document.getElementById("leapLogoSvg");
+        const linesGroup = document.getElementById("leapLinesGroup");
+        const nodesGroup = document.getElementById("leapNodesGroup");
+        if (!svg || !linesGroup || !nodesGroup) return;
+
+        const nodes = [
+          {
+            id: 0,
+            baseX: 55,
+            baseY: 85,
+            baseR: 8,
+            r: 8,
+            x: 55,
+            y: 85,
+            vx: 0,
+            vy: 0,
+            freq1: 0.0011,
+            freq2: 0.0016,
+            rangeX: 12,
+            rangeY: 12,
+            phase: 0.2,
+          },
+          {
+            id: 1,
+            baseX: 122,
+            baseY: 50,
+            baseR: 4.5,
+            r: 4.5,
+            x: 122,
+            y: 50,
+            vx: 0,
+            vy: 0,
+            freq1: 0.0014,
+            freq2: 0.0012,
+            rangeX: 10,
+            rangeY: 11,
+            phase: 2.2,
+          },
+          {
+            id: 2,
+            baseX: 165,
+            baseY: 135,
+            baseR: 7,
+            r: 7,
+            x: 165,
+            y: 135,
+            vx: 0,
+            vy: 0,
+            freq1: 0.001,
+            freq2: 0.0018,
+            rangeX: 13,
+            rangeY: 10,
+            phase: 4.1,
+          },
+          {
+            id: 3,
+            baseX: 220,
+            baseY: 55,
+            baseR: 3.5,
+            r: 3.5,
+            x: 220,
+            y: 55,
+            vx: 0,
+            vy: 0,
+            freq1: 0.0017,
+            freq2: 0.0013,
+            rangeX: 11,
+            rangeY: 12,
+            phase: 1.7,
+          },
+          {
+            id: 4,
+            baseX: 285,
+            baseY: 110,
+            baseR: 7.5,
+            r: 7.5,
+            x: 285,
+            y: 110,
+            vx: 0,
+            vy: 0,
+            freq1: 0.00095,
+            freq2: 0.00135,
+            rangeX: 13,
+            rangeY: 10,
+            phase: 5.1,
+          },
+        ];
+        const connections = [
+          [0, 1],
+          [1, 2],
+          [2, 3],
+          [3, 4],
+        ];
+        const lineElements = [];
+        const circleElements = [];
+
+        connections.forEach(([n1, n2]) => {
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          line.setAttribute("class", "leap-node-line");
+          linesGroup.appendChild(line);
+          lineElements.push({ line, n1, n2 });
+        });
+
+        nodes.forEach((node) => {
+          const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          circle.setAttribute("class", "leap-node-circle");
+          circle.setAttribute("r", node.baseR);
+          nodesGroup.appendChild(circle);
+          circleElements.push({ circle, node });
+        });
+
+        let mouseX = -1000;
+        let mouseY = -1000;
+        let isHovered = false;
+        svg.addEventListener("mousemove", (e) => {
+          const rect = svg.getBoundingClientRect();
+          mouseX = ((e.clientX - rect.left) / rect.width) * 340;
+          mouseY = ((e.clientY - rect.top) / rect.height) * 180;
+          isHovered = true;
+        });
+        svg.addEventListener("mouseleave", () => {
+          isHovered = false;
+        });
+
+        const reduceMotion =
           window.matchMedia &&
-          window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ) {
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (reduceMotion) {
+          lineElements.forEach(({ line, n1, n2 }) => {
+            line.setAttribute("x1", nodes[n1].baseX);
+            line.setAttribute("y1", nodes[n1].baseY);
+            line.setAttribute("x2", nodes[n2].baseX);
+            line.setAttribute("y2", nodes[n2].baseY);
+          });
+          circleElements.forEach(({ circle, node }) => {
+            circle.setAttribute("cx", node.baseX);
+            circle.setAttribute("cy", node.baseY);
+            circle.setAttribute("r", node.baseR);
+          });
           return;
         }
 
-        const ctx = canvas.getContext("2d");
-        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-        const nodes = [
-          // Anchored to the four existing LEAP node locations.
-          { ax: 0.16, ay: 0.3, rx: 4.2, ry: 3.6, speed: 1.2, phase: 0.1 },
-          { ax: 0.39, ay: 0.11, rx: 4.6, ry: 3.9, speed: 1.05, phase: 1.2 },
-          { ax: 0.82, ay: 0.54, rx: 4.1, ry: 4.4, speed: 1.25, phase: 2.1 },
-          { ax: 0.54, ay: 0.81, rx: 4.7, ry: 4.1, speed: 1.1, phase: 2.8 },
-        ];
-        const edges = [
-          [0, 1],
-          [1, 2],
-          [1, 3],
-          [3, 2],
-        ];
-        let width = 0;
-        let height = 0;
-        let raf = 0;
-        let t0 = performance.now();
+        let prevTime = performance.now();
+        function animate(currentTime) {
+          const dt = Math.min((currentTime - prevTime) / 16.66, 2.5);
+          prevTime = currentTime;
 
-        function resize() {
-          width = frame.clientWidth;
-          height = frame.clientHeight;
-          canvas.width = Math.max(1, Math.floor(width * dpr));
-          canvas.height = Math.max(1, Math.floor(height * dpr));
-          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          nodes.forEach((node) => {
+            const targetX =
+              node.baseX +
+              Math.sin(currentTime * node.freq1 + node.phase) * node.rangeX +
+              Math.cos(currentTime * node.freq2 * 0.72) * (node.rangeX * 0.35);
+            const targetY =
+              node.baseY +
+              Math.cos(currentTime * node.freq2 + node.phase) * node.rangeY +
+              Math.sin(currentTime * node.freq1 * 1.2) * (node.rangeY * 0.35);
+
+            let forceX = (targetX - node.x) * 0.055;
+            let forceY = (targetY - node.y) * 0.055;
+
+            if (isHovered) {
+              const dx = node.x - mouseX;
+              const dy = node.y - mouseY;
+              const distSq = dx * dx + dy * dy;
+              const dist = Math.sqrt(distSq);
+              const repelRadius = 68;
+              if (dist < repelRadius && dist > 0) {
+                const repelStrength =
+                  Math.pow((repelRadius - dist) / repelRadius, 2) * 1.35;
+                forceX += (dx / dist) * repelStrength;
+                forceY += (dy / dist) * repelStrength;
+                node.r += (node.baseR * 1.25 - node.r) * 0.11 * dt;
+              } else {
+                node.r += (node.baseR - node.r) * 0.08 * dt;
+              }
+            } else {
+              node.r += (node.baseR - node.r) * 0.08 * dt;
+            }
+
+            node.vx = (node.vx + forceX * dt) * 0.9;
+            node.vy = (node.vy + forceY * dt) * 0.9;
+            node.x += node.vx * dt;
+            node.y += node.vy * dt;
+
+            const pulse = Math.sin(currentTime * 0.003 + node.phase) * 0.45;
+            const finalR = Math.max(0.1, node.r + pulse);
+
+            const circleEntry = circleElements.find((c) => c.node.id === node.id);
+            circleEntry.circle.setAttribute("cx", node.x);
+            circleEntry.circle.setAttribute("cy", node.y);
+            circleEntry.circle.setAttribute("r", finalR);
+          });
+
+          lineElements.forEach(({ line, n1, n2 }) => {
+            line.setAttribute("x1", nodes[n1].x);
+            line.setAttribute("y1", nodes[n1].y);
+            line.setAttribute("x2", nodes[n2].x);
+            line.setAttribute("y2", nodes[n2].y);
+
+            const dx = nodes[n1].x - nodes[n2].x;
+            const dy = nodes[n1].y - nodes[n2].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const baseOpacity = isHovered ? 0.92 : 0.68;
+            const ratio = Math.min(1, 98 / Math.max(10, dist));
+            line.style.opacity = String(baseOpacity * (0.5 + 0.5 * ratio));
+          });
+
+          requestAnimationFrame(animate);
         }
 
-        function draw(ts) {
-          const t = (ts - t0) / 1000;
-          ctx.clearRect(0, 0, width, height);
-
-          const live = nodes.map((n) => ({
-            x: n.ax * width + Math.sin(t * n.speed + n.phase) * n.rx,
-            y:
-              n.ay * height +
-              Math.cos(t * n.speed * 0.92 + n.phase * 1.1) * n.ry,
-          }));
-
-          ctx.lineWidth = 1.8;
-          ctx.strokeStyle = "rgba(96, 165, 250, 0.82)";
-          for (const [i, j] of edges) {
-            ctx.beginPath();
-            ctx.moveTo(live[i].x, live[i].y);
-            ctx.lineTo(live[j].x, live[j].y);
-            ctx.stroke();
-          }
-
-          for (const p of live) {
-            ctx.fillStyle = "rgba(125, 211, 252, 0.98)";
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 4.6, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
-            ctx.lineWidth = 1.2;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 4.6, 0, Math.PI * 2);
-            ctx.stroke();
-          }
-
-          raf = requestAnimationFrame(draw);
-        }
-
-        resize();
-        raf = requestAnimationFrame(draw);
-        window.addEventListener("resize", () => {
-          cancelAnimationFrame(raf);
-          resize();
-          t0 = performance.now();
-          raf = requestAnimationFrame(draw);
-        });
+        requestAnimationFrame(animate);
       }
 
       // ── Load script ───────────────────────────────────────────
