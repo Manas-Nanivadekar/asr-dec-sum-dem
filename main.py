@@ -30,6 +30,7 @@ SUMMARIZATION_CONFIG = {
     "model": {
         "name": "meta-llama/Llama-3.1-8B-Instruct",
         "fallback_name": "meta-llama/Llama-3.2-3B-Instruct",
+        "public_fallback_name": "Qwen/Qwen2.5-7B-Instruct",
         "torch_dtype": "float16",
         "device": "cuda",
         "device_map": "auto",
@@ -199,31 +200,26 @@ def _load_summarization_stack(model_name: str, token: str | None):
     return tokenizer, model
 
 
-try:
-    sum_tokenizer, sum_model = _load_summarization_stack(
-        SUMMARIZATION_CONFIG["model"]["name"],
-        _sum_model_token,
-    )
-except Exception as e:
-    err = str(e)
-    fallback_name = SUMMARIZATION_CONFIG["model"].get("fallback_name")
-    if fallback_name and (
-        "torch.accelerator" in err
-        or "quantizer_mxfp4" in err
-        or "has no attribute 'accelerator'" in err
-        or "out of memory" in err.lower()
-    ):
-        print(
-            "Primary summarization model load failed "
-            f"({err}). Falling back to {fallback_name}."
-        )
-        sum_tokenizer, sum_model = _load_summarization_stack(
-            fallback_name,
-            _sum_model_token,
-        )
-        SUMMARIZATION_CONFIG["model"]["active_name"] = fallback_name
-    else:
-        raise
+_model_candidates = [
+    SUMMARIZATION_CONFIG["model"]["name"],
+    SUMMARIZATION_CONFIG["model"].get("fallback_name"),
+    SUMMARIZATION_CONFIG["model"].get("public_fallback_name"),
+]
+_model_candidates = [m for i, m in enumerate(_model_candidates) if m and m not in _model_candidates[:i]]
+
+_load_errors = []
+for candidate in _model_candidates:
+    try:
+        sum_tokenizer, sum_model = _load_summarization_stack(candidate, _sum_model_token)
+        SUMMARIZATION_CONFIG["model"]["active_name"] = candidate
+        break
+    except Exception as e:
+        err = str(e)
+        _load_errors.append(f"{candidate}: {err}")
+        print(f"Summarization model load failed for {candidate}. Trying next option...")
+else:
+    joined = "\n".join(_load_errors)
+    raise RuntimeError(f"Unable to load any summarization model. Errors:\n{joined}")
 
 sum_model.eval()
 
