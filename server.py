@@ -7,6 +7,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from pydantic import BaseModel
 
@@ -24,6 +25,7 @@ from main import pipeline, summarize_transcript
 log.info("All models ready.")
 
 app = FastAPI()
+app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 
 # ── Always-JSON exception handlers ───────────────────────

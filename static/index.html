@@ -3,84 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IndicSpeech Lab — ASR + Diarization + Summarization</title>
+  <title>Indic Speech — LEAP Lab, IISc</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   />
   <style>
-    /* ── Reset ──────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
 
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: #F8FAFC;
+      background: #F0F4F8;
       color: #0F172A;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
+      display: flex; flex-direction: column;
+      height: 100vh; overflow: hidden;
     }
 
-    /* ── Header ─────────────────────────────────────────── */
-    header {
+    /* ── Top identity bar ─────────────────────────────── */
+    .identity-bar {
       flex-shrink: 0;
-      background: #0F172A;
-      color: white;
-      padding: 0 32px;
-      height: 58px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      background: #fff;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 0 28px;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .header-left { display: flex; align-items: center; gap: 16px; }
-    .header-logo {
-      width: 32px; height: 32px;
-      background: linear-gradient(135deg, #6366F1, #8B5CF6);
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; flex-shrink: 0;
+    .identity-left { display: flex; align-items: center; gap: 14px; }
+    .id-logo { height: 42px; width: auto; object-fit: contain; }
+    .id-divider { width: 1px; height: 32px; background: #E2E8F0; }
+    .id-text-group { display: flex; flex-direction: column; gap: 1px; }
+    .id-institute { font-size: 13px; font-weight: 700; color: #1B4D8E; letter-spacing: -0.1px; }
+    .id-lab       { font-size: 11px; color: #64748B; font-weight: 500; }
+
+    .identity-right { display: flex; align-items: center; gap: 16px; }
+    .leap-logo { height: 28px; width: auto; object-fit: contain; }
+    .openday-badge {
+      display: flex; align-items: center; gap: 7px;
+      background: #1B4D8E; color: #fff;
+      border-radius: 6px; padding: 5px 12px;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.02em;
     }
-    .header-title { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
-    .header-sub   { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 1px; }
-    .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,.1); }
-    .header-badge {
-      display: flex; align-items: center; gap: 6px;
-      background: rgba(99,102,241,.2); border: 1px solid rgba(99,102,241,.35);
-      border-radius: 20px; padding: 3px 10px 3px 6px;
-      font-size: 11px; font-weight: 600; color: #A5B4FC;
+    .openday-badge span { opacity: .75; font-weight: 500; }
+
+    /* ── Tool header ──────────────────────────────────── */
+    .tool-header {
+      flex-shrink: 0;
+      background: #1B4D8E;
+      padding: 12px 28px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .badge-dot {
-      width: 6px; height: 6px; border-radius: 50%; background: #6EE7B7;
-      box-shadow: 0 0 0 2px rgba(110,231,183,.3);
-    }
-    .header-model-tag {
-      font-size: 11px; color: rgba(255,255,255,.3);
-      font-family: 'JetBrains Mono', monospace;
+    .tool-title { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+    .tool-sub   { font-size: 11px; color: rgba(255,255,255,.6); margin-top: 2px; font-weight: 400; }
+    .tool-pills { display: flex; gap: 6px; }
+    .pill {
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      border-radius: 20px; padding: 3px 10px;
+      font-size: 11px; font-weight: 600; color: rgba(255,255,255,.85);
     }
 
-    /* ── Layout ─────────────────────────────────────────── */
+    /* ── Layout ───────────────────────────────────────── */
     .layout {
       flex: 1;
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 320px 1fr;
       overflow: hidden;
     }
 
-    /* ── Left Panel ─────────────────────────────────────── */
+    /* ── Left Panel ───────────────────────────────────── */
     .left {
       background: #fff;
       border-right: 1px solid #E2E8F0;
       display: flex; flex-direction: column;
       overflow-y: auto;
     }
-    .panel-section {
-      padding: 18px 20px;
-      border-bottom: 1px solid #F1F5F9;
-    }
+    .panel-section { padding: 18px 18px; border-bottom: 1px solid #F1F5F9; }
     .panel-section:last-child { border-bottom: none; }
     .section-heading {
       font-size: 10px; font-weight: 700;
@@ -90,10 +88,10 @@
     }
     .section-heading::after { content:''; flex:1; height:1px; background:#F1F5F9; }
 
-    /* ── Input Tabs ─────────────────────────────────────── */
+    /* ── Input Tabs ───────────────────────────────────── */
     .input-tabs {
       display: flex; background: #F1F5F9;
-      border-radius: 8px; padding: 3px; margin-bottom: 16px; gap: 2px;
+      border-radius: 8px; padding: 3px; margin-bottom: 14px; gap: 2px;
     }
     .itab {
       flex: 1; padding: 7px 10px;
@@ -103,13 +101,13 @@
       text-align: center; border: none; background: transparent;
     }
     .itab.active {
-      background: #fff; color: #4F46E5;
-      box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 1px rgba(0,0,0,.04);
+      background: #fff; color: #1B4D8E;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08);
     }
     .itab-pane { display: none; }
     .itab-pane.active { display: block; }
 
-    /* ── Record ─────────────────────────────────────────── */
+    /* ── Record ───────────────────────────────────────── */
     .record-area {
       display: flex; flex-direction: column;
       align-items: center; gap: 10px; padding: 4px 0 8px;
@@ -137,10 +135,10 @@
       font-size: 22px; transition: transform .15s, box-shadow .15s;
     }
     .mic-btn.idle {
-      background: linear-gradient(135deg, #4F46E5, #7C3AED);
-      box-shadow: 0 4px 14px rgba(79,70,229,.4);
+      background: linear-gradient(135deg, #1B4D8E, #2563EB);
+      box-shadow: 0 4px 14px rgba(27,77,142,.4);
     }
-    .mic-btn.idle:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(79,70,229,.5); }
+    .mic-btn.idle:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(27,77,142,.5); }
     .mic-btn.recording {
       background: linear-gradient(135deg, #EF4444, #DC2626);
       box-shadow: 0 4px 14px rgba(239,68,68,.4);
@@ -156,13 +154,13 @@
     .audio-preview { width: 100%; height: 32px; border-radius: 6px; display: none; margin-top: 2px; }
     .audio-preview.visible { display: block; }
 
-    /* ── Upload ─────────────────────────────────────────── */
+    /* ── Upload ───────────────────────────────────────── */
     .drop-zone {
       border: 1.5px dashed #CBD5E1; border-radius: 10px;
-      padding: 22px 14px; text-align: center;
+      padding: 20px 14px; text-align: center;
       cursor: pointer; transition: all .2s; background: #FAFAFA;
     }
-    .drop-zone:hover, .drop-zone.over { border-color: #6366F1; background: #EEF2FF; }
+    .drop-zone:hover, .drop-zone.over { border-color: #1B4D8E; background: #EFF6FF; }
     .dz-icon { font-size: 24px; margin-bottom: 7px; opacity: .7; }
     .dz-label { font-size: 13px; color: #475569; font-weight: 500; }
     .dz-hint  { font-size: 11px; color: #94A3B8; margin-top: 3px; }
@@ -175,37 +173,17 @@
     .file-badge.visible { display: flex; }
     .file-badge .fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 
-    /* ── Pipeline model list ─────────────────────────────── */
-    .model-list { display: flex; flex-direction: column; gap: 7px; }
-    .model-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 12px; border-radius: 8px;
-      border: 1px solid #F1F5F9; background: #FAFAFA;
-    }
-    .model-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .model-name {
-      font-size: 11px; font-weight: 600; color: #334155;
-      font-family: 'JetBrains Mono', monospace; flex: 1;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .model-role {
-      font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .06em; color: #94A3B8;
-    }
-
-    /* ── Run button ──────────────────────────────────────── */
+    /* ── Run button ───────────────────────────────────── */
     .btn-run {
       width: 100%; padding: 12px;
-      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      background: linear-gradient(135deg, #1B4D8E, #2563EB);
       color: white; border: none; border-radius: 9px;
       font-size: 14px; font-weight: 700; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 8px;
       transition: opacity .15s, transform .15s, box-shadow .15s;
-      box-shadow: 0 2px 10px rgba(79,70,229,.35); letter-spacing: -0.1px;
+      box-shadow: 0 2px 10px rgba(27,77,142,.3); letter-spacing: -0.1px;
     }
-    .btn-run:hover:not(:disabled) {
-      transform: translateY(-1px); box-shadow: 0 4px 18px rgba(79,70,229,.45);
-    }
+    .btn-run:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(27,77,142,.4); }
     .btn-run:disabled { opacity: .4; cursor: not-allowed; transform: none; }
     .spinner-white {
       display: inline-block; width: 14px; height: 14px;
@@ -218,179 +196,110 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* ── Right Panel ────────────────────────────────────── */
-    .right {
-      display: flex; flex-direction: column; overflow: hidden; background: #F8FAFC;
-    }
+    /* ── Right Panel ──────────────────────────────────── */
+    .right { display: flex; flex-direction: column; overflow: hidden; background: #F0F4F8; }
 
-    /* ── Global tab bar (always visible) ────────────────── */
+    /* ── Global tab bar ───────────────────────────────── */
     .global-tabs {
-      flex-shrink: 0;
-      display: flex; background: #fff;
-      border-bottom: 1px solid #E2E8F0;
-      padding: 0 28px; gap: 0;
+      flex-shrink: 0; display: flex; background: #fff;
+      border-bottom: 1px solid #E2E8F0; padding: 0 24px;
     }
     .gtab {
-      padding: 12px 18px; font-size: 13px; font-weight: 600; color: #64748B;
+      padding: 12px 16px; font-size: 13px; font-weight: 600; color: #64748B;
       border: none; background: transparent; cursor: pointer;
       border-bottom: 2px solid transparent; transition: color .15s;
       display: flex; align-items: center; gap: 6px;
     }
-    .gtab:hover  { color: #4F46E5; }
-    .gtab.active { color: #4F46E5; border-bottom-color: #4F46E5; }
+    .gtab:hover { color: #1B4D8E; }
+    .gtab.active { color: #1B4D8E; border-bottom-color: #1B4D8E; }
     .gtab.locked { opacity: .4; cursor: default; }
     .gtab-badge {
       display: inline-flex; align-items: center; justify-content: center;
       width: 18px; height: 18px; border-radius: 50%;
       font-size: 10px; font-weight: 700;
-      background: #EEF2FF; color: #4F46E5;
+      background: #DBEAFE; color: #1B4D8E;
     }
     .gtab-badge.spin {
       background: transparent; border: 1.5px solid #CBD5E1;
-      border-top-color: #4F46E5; animation: spin .6s linear infinite;
+      border-top-color: #1B4D8E; animation: spin .6s linear infinite;
     }
 
-    /* ── Stats bar ───────────────────────────────────────── */
+    /* ── Stats bar ────────────────────────────────────── */
     .stats-bar {
-      flex-shrink: 0; display: flex; gap: 0;
-      background: #fff; border-bottom: 1px solid #E2E8F0; padding: 0 28px;
+      flex-shrink: 0; display: flex;
+      background: #fff; border-bottom: 1px solid #E2E8F0; padding: 0 24px;
     }
-    .stat-item { padding: 12px 24px 12px 0; margin-right: 24px; border-right: 1px solid #F1F5F9; }
+    .stat-item { padding: 11px 24px 11px 0; margin-right: 24px; border-right: 1px solid #F1F5F9; }
     .stat-item:last-child { border-right: none; }
     .stat-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #94A3B8; }
     .stat-num { font-size: 20px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; margin-top: 1px; font-variant-numeric: tabular-nums; }
 
-    /* ── Pane container ──────────────────────────────────── */
+    /* ── Panes ────────────────────────────────────────── */
     .pane-wrap { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
     .gpane { display: none; flex: 1; overflow-y: auto; }
     .gpane.active { display: block; }
 
-    /* ── Script pane ─────────────────────────────────────── */
-    .script-header {
-      padding: 18px 28px 0;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .script-meta { font-size: 12px; color: #94A3B8; }
-    .script-role-legend {
-      display: flex; gap: 14px; padding: 14px 28px;
-    }
-    .role-chip {
-      display: flex; align-items: center; gap: 7px;
-      font-size: 12px; font-weight: 600; color: #475569;
-    }
-    .role-swatch {
-      width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
-    }
-    .script-lines { padding: 0 28px 28px; display: flex; flex-direction: column; gap: 10px; }
-    .script-turn { display: flex; gap: 0; align-items: flex-end; }
-
-    /* health worker — left */
+    /* ── Script pane ──────────────────────────────────── */
+    .script-header { padding: 16px 24px 0; }
+    .script-header-title { font-size: 13px; font-weight: 700; color: #1B4D8E; }
+    .script-header-sub   { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+    .script-role-legend  { display: flex; gap: 16px; padding: 12px 24px; }
+    .role-chip { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: #475569; }
+    .role-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+    .script-lines { padding: 0 24px 28px; display: flex; flex-direction: column; gap: 10px; }
+    .script-turn { display: flex; align-items: flex-end; gap: 0; }
     .script-turn.spk0 { justify-content: flex-start; }
     .script-turn.spk0 .bubble {
-      background: #EEF2FF; border: 1px solid #C7D2FE;
-      border-radius: 16px 16px 16px 4px;
-      max-width: 76%; padding: 10px 14px;
+      background: #EFF6FF; border: 1px solid #BFDBFE;
+      border-radius: 16px 16px 16px 4px; max-width: 76%; padding: 10px 14px;
     }
-    .script-turn.spk0 .bubble-spk { color: #4F46E5; }
-
-    /* patient — right */
+    .script-turn.spk0 .bubble-spk { color: #1B4D8E; }
     .script-turn.spk1 { justify-content: flex-end; }
     .script-turn.spk1 .bubble {
       background: #F1F5F9; border: 1px solid #E2E8F0;
-      border-radius: 16px 16px 4px 16px;
-      max-width: 76%; padding: 10px 14px;
+      border-radius: 16px 16px 4px 16px; max-width: 76%; padding: 10px 14px;
     }
-    .script-turn.spk1 .bubble-spk { color: #64748B; }
-
-    .bubble-spk {
-      font-size: 10px; font-weight: 800;
-      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px;
-    }
+    .script-turn.spk1 .bubble-spk { color: #475569; }
+    .bubble-spk { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
     .bubble-text {
       font-size: 16px; line-height: 1.7; color: #0F172A;
       font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'Inter', sans-serif;
     }
-    .line-num {
-      font-size: 10px; color: #CBD5E1;
-      font-family: 'JetBrains Mono', monospace;
-      margin: 0 8px 4px; flex-shrink: 0; align-self: flex-end;
-    }
+    .line-num { font-size: 10px; color: #CBD5E1; font-family: 'JetBrains Mono', monospace; margin: 0 8px 4px; flex-shrink: 0; align-self: flex-end; }
 
-    /* ── Transcript pane ─────────────────────────────────── */
-    .trans-wrap { padding: 20px 28px; }
+    /* ── Transcript pane ──────────────────────────────── */
+    .trans-wrap { padding: 18px 24px; }
     .spk-legend { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-    .spk-chip {
-      display: flex; align-items: center; gap: 5px;
-      padding: 4px 10px 4px 7px; border-radius: 20px;
-      font-size: 11px; font-weight: 700;
-    }
+    .spk-chip { display: flex; align-items: center; gap: 5px; padding: 4px 10px 4px 7px; border-radius: 20px; font-size: 11px; font-weight: 700; }
     .spk-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .utterances { display: flex; flex-direction: column; gap: 3px; }
-    .utt {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 10px 14px; border-radius: 8px;
-      border-left: 3px solid transparent; transition: filter .1s;
-    }
+    .utt { display: flex; align-items: flex-start; gap: 14px; padding: 10px 14px; border-radius: 8px; border-left: 3px solid transparent; transition: filter .1s; }
     .utt:hover { filter: brightness(.97); }
     .utt-meta { min-width: 56px; flex-shrink: 0; }
     .utt-spk { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
-    .utt-time {
-      font-size: 9.5px; color: #94A3B8; margin-top: 3px;
-      font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
-    }
-    .utt-text {
-      font-size: 15px; line-height: 1.75; color: #1E293B; flex: 1;
-      font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'Inter', sans-serif;
-    }
+    .utt-time { font-size: 9.5px; color: #94A3B8; margin-top: 3px; font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+    .utt-text { font-size: 15px; line-height: 1.75; color: #1E293B; flex: 1; font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'Inter', sans-serif; }
 
-    /* placeholder inside pane */
-    .pane-placeholder {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      height: 100%; gap: 12px; color: #94A3B8; text-align: center; padding: 40px;
-    }
-    .pane-placeholder .ph-ico { font-size: 38px; opacity: .3; }
+    .pane-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; color: #94A3B8; text-align: center; padding: 40px; }
+    .pane-placeholder .ph-ico { font-size: 36px; opacity: .3; }
     .pane-placeholder p { font-size: 13px; line-height: 1.6; }
 
-    /* ── Summary pane ────────────────────────────────────── */
-    .sum-wrap { padding: 20px 28px; }
-    .sum-loading {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 12px; padding: 60px 20px; color: #94A3B8;
-    }
-    .sum-spinner {
-      width: 32px; height: 32px; border: 3px solid #E2E8F0;
-      border-top-color: #6366F1; border-radius: 50%; animation: spin .8s linear infinite;
-    }
+    /* ── Summary pane ─────────────────────────────────── */
+    .sum-wrap { padding: 18px 24px; }
+    .sum-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 60px 20px; color: #94A3B8; }
+    .sum-spinner { width: 32px; height: 32px; border: 3px solid #E2E8F0; border-top-color: #1B4D8E; border-radius: 50%; animation: spin .8s linear infinite; }
     .sum-loading-lbl { font-size: 13px; font-weight: 600; color: #475569; }
     .sum-loading-sub { font-size: 12px; }
-    .sum-card {
-      background: #fff; border: 1px solid #E2E8F0; border-radius: 12px;
-      overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.04);
-    }
-    .sum-card-hdr {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 13px 20px; border-bottom: 1px solid #F1F5F9; background: #FAFAFA;
-    }
+    .sum-card { background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+    .sum-card-hdr { display: flex; align-items: center; padding: 13px 20px; border-bottom: 1px solid #F1F5F9; background: #F8FAFC; }
     .sum-card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #475569; }
-    .sum-model-tag {
-      font-size: 10px; font-weight: 600; font-family: 'JetBrains Mono', monospace;
-      color: #94A3B8; background: #F1F5F9; padding: 3px 8px; border-radius: 4px;
-    }
     .sum-body { padding: 20px; font-size: 15px; line-height: 1.85; color: #1E293B; white-space: pre-wrap; }
-    .sum-footer {
-      padding: 10px 20px; border-top: 1px solid #F1F5F9;
-      font-size: 11px; color: #94A3B8; display: flex; gap: 14px;
-    }
+    .sum-footer { padding: 10px 20px; border-top: 1px solid #F1F5F9; font-size: 11px; color: #94A3B8; display: flex; gap: 14px; }
 
-    /* ── Error card ──────────────────────────────────────── */
-    .err-card {
-      background: #FEF2F2; border: 1px solid #FECACA;
-      border-radius: 10px; padding: 16px 20px;
-      color: #DC2626; font-size: 13px; line-height: 1.6;
-    }
+    /* ── Error ────────────────────────────────────────── */
+    .err-card { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 16px 20px; color: #DC2626; font-size: 13px; line-height: 1.6; }
 
-    /* ── Scrollbar ──────────────────────────────────────── */
+    /* ── Scrollbar ────────────────────────────────────── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
@@ -399,32 +308,47 @@
 </head>
 <body>
 
-<!-- ─── Header ────────────────────────────────────────────── -->
-<header>
-  <div class="header-left">
-    <div class="header-logo">&#127897;</div>
-    <div>
-      <div class="header-title">IndicSpeech Lab</div>
-      <div class="header-sub">ASR &middot; Speaker Diarization &middot; Summarization</div>
+<!-- ─── Identity Bar ──────────────────────────────────────── -->
+<div class="identity-bar">
+  <div class="identity-left">
+    <img class="id-logo" src="/assets/iisc.jpeg" alt="IISc" />
+    <div class="id-divider"></div>
+    <div class="id-text-group">
+      <div class="id-institute">Indian Institute of Science</div>
+      <div class="id-lab">Department of Electrical Communication Engineering</div>
     </div>
-    <div class="header-divider"></div>
-    <div class="header-badge"><div class="badge-dot"></div>Models loaded</div>
   </div>
-</header>
+  <div class="identity-right">
+    <img class="leap-logo" src="/assets/leap-1.png" alt="LEAP Lab" />
+    <div class="openday-badge">Open Day <span>2026</span></div>
+  </div>
+</div>
 
-<!-- ─── Layout ───────────────────────────────────────────── -->
+<!-- ─── Tool Header ───────────────────────────────────────── -->
+<div class="tool-header">
+  <div>
+    <div class="tool-title">Indic Speech Transcription &amp; Summarization</div>
+    <div class="tool-sub">Automatic Speech Recognition &middot; Speaker Diarization &middot; AI Summarization</div>
+  </div>
+  <div class="tool-pills">
+    <div class="pill">Hindi</div>
+    <div class="pill">Multilingual</div>
+    <div class="pill">Real-time</div>
+  </div>
+</div>
+
+<!-- ─── Main Layout ───────────────────────────────────────── -->
 <div class="layout">
 
-  <!-- Left panel -->
+  <!-- Left -->
   <div class="left">
     <div class="panel-section">
       <div class="section-heading">Audio Input</div>
       <div class="input-tabs">
-        <button class="itab active" data-tab="record">&#127897; Record</button>
-        <button class="itab"        data-tab="upload">&#128193; Upload</button>
+        <button class="itab active" data-tab="record">&#127897;&nbsp; Record</button>
+        <button class="itab"        data-tab="upload">&#128193;&nbsp; Upload</button>
       </div>
 
-      <!-- Record -->
       <div class="itab-pane active" id="pane-record">
         <div class="record-area">
           <div class="mic-ring" id="micRing">
@@ -437,7 +361,6 @@
         <audio class="audio-preview" id="audioPreview" controls></audio>
       </div>
 
-      <!-- Upload -->
       <div class="itab-pane" id="pane-upload">
         <div class="drop-zone" id="dropZone">
           <div class="dz-icon">&#127925;</div>
@@ -461,14 +384,11 @@
     </div>
   </div>
 
-  <!-- Right panel -->
+  <!-- Right -->
   <div class="right">
 
-    <!-- Always-visible tab bar -->
     <div class="global-tabs">
-      <button class="gtab active" data-gtab="script">
-        &#128218; Script
-      </button>
+      <button class="gtab active" data-gtab="script">&#128218;&nbsp; Script</button>
       <button class="gtab locked" data-gtab="transcript" id="tabTranscript">
         Transcript <span class="gtab-badge" id="uttBadge" style="display:none;"></span>
       </button>
@@ -477,36 +397,26 @@
       </button>
     </div>
 
-    <!-- Stats bar (hidden until after run) -->
     <div class="stats-bar" id="statsBar" style="display:none;"></div>
 
-    <!-- Pane container -->
     <div class="pane-wrap">
 
-      <!-- Script pane -->
+      <!-- Script -->
       <div class="gpane active" id="gpane-script">
         <div class="script-header">
-          <div>
-            <div style="font-size:13px;font-weight:700;color:#334155;">Reading Script</div>
-            <div class="script-meta" style="margin-top:2px;">Read these lines aloud to test the pipeline</div>
-          </div>
+          <div class="script-header-title">Reading Script</div>
+          <div class="script-header-sub">Read the lines below aloud to test the system</div>
         </div>
         <div class="script-role-legend">
-          <div class="role-chip">
-            <div class="role-swatch" style="background:#4F46E5;"></div>
-            spk0 &mdash; Health Worker
-          </div>
-          <div class="role-chip">
-            <div class="role-swatch" style="background:#64748B;"></div>
-            spk1 &mdash; Patient
-          </div>
+          <div class="role-chip"><div class="role-swatch" style="background:#1B4D8E;"></div>spk0 &mdash; Health Worker</div>
+          <div class="role-chip"><div class="role-swatch" style="background:#64748B;"></div>spk1 &mdash; Patient</div>
         </div>
         <div class="script-lines" id="scriptLines">
-          <div style="color:#94A3B8;font-size:13px;padding:20px 0;">Loading script&hellip;</div>
+          <div style="color:#94A3B8;font-size:13px;">Loading script&hellip;</div>
         </div>
       </div>
 
-      <!-- Transcript pane -->
+      <!-- Transcript -->
       <div class="gpane" id="gpane-transcript">
         <div class="trans-wrap">
           <div class="pane-placeholder" id="transPlaceholder">
@@ -521,7 +431,7 @@
         </div>
       </div>
 
-      <!-- Summary pane -->
+      <!-- Summary -->
       <div class="gpane" id="gpane-summary">
         <div class="sum-wrap">
           <div class="pane-placeholder" id="sumPlaceholder">
@@ -531,21 +441,20 @@
           <div class="sum-loading" id="sumLoading" style="display:none;">
             <div class="sum-spinner"></div>
             <div class="sum-loading-lbl">Generating summary&hellip;</div>
-            <div class="sum-loading-sub">Llama-3.2-3B-Instruct is analyzing the transcript</div>
+            <div class="sum-loading-sub">AI is analyzing the transcript</div>
           </div>
           <div id="sumContent" style="display:none;"></div>
           <div id="sumErr" style="display:none;"></div>
         </div>
       </div>
 
-    </div><!-- /pane-wrap -->
-  </div><!-- /right -->
-</div><!-- /layout -->
+    </div>
+  </div>
+</div>
 
 <script>
-// ─── Palette ──────────────────────────────────────────────
 const PALETTE = [
-  { fg:'#2563EB', bg:'#EFF6FF', bd:'#BFDBFE' },
+  { fg:'#1D4ED8', bg:'#EFF6FF', bd:'#BFDBFE' },
   { fg:'#DC2626', bg:'#FFF1F2', bd:'#FECACA' },
   { fg:'#16A34A', bg:'#F0FDF4', bd:'#BBF7D0' },
   { fg:'#D97706', bg:'#FFFBEB', bd:'#FDE68A' },
@@ -555,70 +464,50 @@ const PALETTE = [
   { fg:'#C2410C', bg:'#FFF7ED', bd:'#FDBA74' },
 ];
 
-// ─── State ────────────────────────────────────────────────
-let activeTab    = 'record';
-let recordedBlob = null;
-let uploadedFile = null;
-let isRecording  = false;
-let audioCtx, mediaStream, processor, silentGain;
-let audioChunks  = [];
-let timerSecs    = 0;
-let timerID      = null;
+let activeTab = 'record', recordedBlob = null, uploadedFile = null;
+let isRecording = false, audioCtx, mediaStream, processor, silentGain;
+let audioChunks = [], timerSecs = 0, timerID = null;
 
-// ─── Load script on page load ─────────────────────────────
+// ── Load script ───────────────────────────────────────────
 (async () => {
   try {
-    const resp = await fetch('/script');
-    const data = await resp.json();
+    const data = await fetch('/script').then(r => r.json());
     if (data.status !== 'ok') throw new Error(data.detail);
-    renderScript(data.lines);
-  } catch (e) {
+    const ROLES = { spk0: 'Health Worker', spk1: 'Patient' };
+    document.getElementById('scriptLines').innerHTML = data.lines.map((l, i) => {
+      const isSpk0 = l.speaker === 'spk0';
+      const numEl  = `<div class="line-num" style="order:${isSpk0?2:0};">#${i+1}</div>`;
+      return `<div class="script-turn ${esc(l.speaker)}">${numEl}
+        <div class="bubble">
+          <div class="bubble-spk">${esc(ROLES[l.speaker] || l.speaker)}</div>
+          <div class="bubble-text">${esc(l.text)}</div>
+        </div></div>`;
+    }).join('');
+  } catch(e) {
     document.getElementById('scriptLines').innerHTML =
       `<div class="err-card"><strong>Could not load script:</strong> ${esc(e.message)}</div>`;
   }
 })();
 
-function renderScript(lines) {
-  const ROLES = { spk0: 'Health Worker', spk1: 'Patient' };
-  document.getElementById('scriptLines').innerHTML = lines.map((l, i) => {
-    const isSpk0 = l.speaker === 'spk0';
-    const roleLabel = ROLES[l.speaker] || l.speaker;
-    const numSide = isSpk0
-      ? `<div class="line-num" style="order:2;">#${i+1}</div>`
-      : `<div class="line-num" style="order:0;">#${i+1}</div>`;
-    return `<div class="script-turn ${esc(l.speaker)}">
-      ${numSide}
-      <div class="bubble">
-        <div class="bubble-spk">${esc(roleLabel)}</div>
-        <div class="bubble-text">${esc(l.text)}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ─── Global tab switching ─────────────────────────────────
-document.querySelectorAll('.gtab:not(.locked)').forEach(t => {
-  t.addEventListener('click', () => switchGTab(t.dataset.gtab));
-});
-
+// ── Global tabs ───────────────────────────────────────────
+document.querySelectorAll('.gtab:not(.locked)').forEach(t =>
+  t.addEventListener('click', () => switchGTab(t.dataset.gtab))
+);
 function switchGTab(name) {
   document.querySelectorAll('.gtab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.gpane').forEach(x => x.classList.remove('active'));
-  const tab  = document.querySelector(`.gtab[data-gtab="${name}"]`);
-  const pane = document.getElementById(`gpane-${name}`);
-  if (tab)  tab.classList.add('active');
-  if (pane) pane.classList.add('active');
+  document.querySelector(`.gtab[data-gtab="${name}"]`)?.classList.add('active');
+  document.getElementById(`gpane-${name}`)?.classList.add('active');
 }
-
 function unlockTab(name) {
   const t = document.querySelector(`.gtab[data-gtab="${name}"]`);
-  if (t) {
+  if (t && t.classList.contains('locked')) {
     t.classList.remove('locked');
     t.addEventListener('click', () => switchGTab(t.dataset.gtab));
   }
 }
 
-// ─── Input tab switching ──────────────────────────────────
+// ── Input tabs ────────────────────────────────────────────
 document.querySelectorAll('.itab').forEach(t =>
   t.addEventListener('click', () => {
     activeTab = t.dataset.tab;
@@ -630,11 +519,11 @@ document.querySelectorAll('.itab').forEach(t =>
   })
 );
 
-// ─── Recording ────────────────────────────────────────────
-const micRing      = document.getElementById('micRing');
-const micBtn       = document.getElementById('micBtn');
-const recStatus    = document.getElementById('recStatus');
-const recTimer     = document.getElementById('recTimer');
+// ── Recording ─────────────────────────────────────────────
+const micRing = document.getElementById('micRing');
+const micBtn  = document.getElementById('micBtn');
+const recStatus = document.getElementById('recStatus');
+const recTimer  = document.getElementById('recTimer');
 const audioPreview = document.getElementById('audioPreview');
 
 micBtn.addEventListener('click', () => isRecording ? stopRec() : startRec());
@@ -647,7 +536,7 @@ async function startRec() {
     return;
   }
   audioCtx = new AudioContext(); audioChunks = [];
-  const src  = audioCtx.createMediaStreamSource(mediaStream);
+  const src = audioCtx.createMediaStreamSource(mediaStream);
   processor  = audioCtx.createScriptProcessor(4096, 1, 1);
   silentGain = audioCtx.createGain(); silentGain.gain.value = 0;
   processor.onaudioprocess = e => { if (isRecording) audioChunks.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
@@ -667,11 +556,9 @@ async function stopRec() {
   isRecording = false; clearInterval(timerID);
   processor.disconnect(); mediaStream.getTracks().forEach(t => t.stop());
   await audioCtx.close();
-
-  const total = audioChunks.reduce((s, c) => s + c.length, 0);
+  const total = audioChunks.reduce((s,c) => s+c.length, 0);
   const merged = new Float32Array(total);
-  let off = 0; for (const c of audioChunks) { merged.set(c, off); off += c.length; }
-
+  let off = 0; for (const c of audioChunks) { merged.set(c,off); off+=c.length; }
   recordedBlob = toWavBlob(merged, audioCtx.sampleRate);
   audioPreview.src = URL.createObjectURL(recordedBlob);
   audioPreview.classList.add('visible');
@@ -681,229 +568,137 @@ async function stopRec() {
   syncBtn();
 }
 
-function fmtTimer(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+function fmtTimer(s) { return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
 
 function toWavBlob(samples, sr) {
-  const dLen = samples.length * 2;
-  const buf = new ArrayBuffer(44 + dLen); const v = new DataView(buf);
-  const s = (o, x) => { for (let i=0;i<x.length;i++) v.setUint8(o+i,x.charCodeAt(i)); };
-  s(0,'RIFF'); v.setUint32(4,36+dLen,true); s(8,'WAVE'); s(12,'fmt ');
-  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
-  v.setUint32(24,sr,true); v.setUint32(28,sr*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true);
-  s(36,'data'); v.setUint32(40,dLen,true);
-  let o = 44;
-  for (let i=0;i<samples.length;i++) {
-    const x = Math.max(-1,Math.min(1,samples[i]));
-    v.setInt16(o, x<0?x*32768:x*32767, true); o+=2;
-  }
+  const dLen=samples.length*2, buf=new ArrayBuffer(44+dLen), v=new DataView(buf);
+  const s=(o,x)=>{for(let i=0;i<x.length;i++)v.setUint8(o+i,x.charCodeAt(i));};
+  s(0,'RIFF');v.setUint32(4,36+dLen,true);s(8,'WAVE');s(12,'fmt ');
+  v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+  v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);
+  s(36,'data');v.setUint32(40,dLen,true);
+  let o=44; for(let i=0;i<samples.length;i++){const x=Math.max(-1,Math.min(1,samples[i]));v.setInt16(o,x<0?x*32768:x*32767,true);o+=2;}
   return new Blob([buf],{type:'audio/wav'});
 }
 
-// ─── Upload ───────────────────────────────────────────────
-const dropZone   = document.getElementById('dropZone');
-const fileInput  = document.getElementById('fileInput');
-const fileBadge  = document.getElementById('fileBadge');
-const fileNameEl = document.getElementById('fileName');
-
-dropZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => { if (e.target.files[0]) pickFile(e.target.files[0]); });
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault(); dropZone.classList.remove('over');
-  if (e.dataTransfer.files[0]) pickFile(e.dataTransfer.files[0]);
-});
-function pickFile(f) { uploadedFile=f; fileNameEl.textContent=f.name; fileBadge.classList.add('visible'); syncBtn(); }
-
-function syncBtn() {
-  const ready = (activeTab==='record' && recordedBlob) || (activeTab==='upload' && uploadedFile);
-  document.getElementById('btnGo').disabled = !ready;
+// ── Upload ────────────────────────────────────────────────
+const dropZone=document.getElementById('dropZone'), fileInput=document.getElementById('fileInput');
+const fileBadge=document.getElementById('fileBadge'), fileNameEl=document.getElementById('fileName');
+dropZone.addEventListener('click',()=>fileInput.click());
+fileInput.addEventListener('change',e=>{if(e.target.files[0])pickFile(e.target.files[0]);});
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('over'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('over');if(e.dataTransfer.files[0])pickFile(e.dataTransfer.files[0]);});
+function pickFile(f){uploadedFile=f;fileNameEl.textContent=f.name;fileBadge.classList.add('visible');syncBtn();}
+function syncBtn(){
+  const ready=(activeTab==='record'&&recordedBlob)||(activeTab==='upload'&&uploadedFile);
+  document.getElementById('btnGo').disabled=!ready;
 }
 
-// ─── Run pipeline ─────────────────────────────────────────
+// ── Run pipeline ──────────────────────────────────────────
 document.getElementById('btnGo').addEventListener('click', async () => {
   const blob = activeTab==='record' ? recordedBlob : uploadedFile;
   if (!blob) return;
+  const btn=document.getElementById('btnGo'), btnIcon=document.getElementById('btnIcon');
+  const btnLabel=document.getElementById('btnLabel'), btnElapsed=document.getElementById('btnElapsed');
+  btn.disabled=true; btnIcon.innerHTML='<span class="spinner-white"></span>';
+  btnLabel.textContent='Transcribing\u2026'; btnElapsed.style.display='inline'; btnElapsed.textContent='0:00';
+  let eSecs=0; const elID=setInterval(()=>{eSecs++;btnElapsed.textContent=fmtTimer(eSecs);},1000);
 
-  const btn = document.getElementById('btnGo');
-  const btnIcon = document.getElementById('btnIcon');
-  const btnLabel = document.getElementById('btnLabel');
-  const btnElapsed = document.getElementById('btnElapsed');
+  // Reset panes
+  ['transPlaceholder','transContent','transErr','sumPlaceholder','sumLoading','sumContent','sumErr']
+    .forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+  document.getElementById('transPlaceholder').style.display='flex';
+  document.getElementById('sumPlaceholder').style.display='flex';
+  document.getElementById('statsBar').style.display='none';
+  document.getElementById('uttBadge').style.display='none';
+  document.getElementById('sumBadge').style.display='none';
 
-  btn.disabled = true;
-  btnIcon.innerHTML = '<span class="spinner-white"></span>';
-  btnLabel.textContent = 'Transcribing\u2026';
-  btnElapsed.style.display = 'inline';
-  btnElapsed.textContent = '0:00';
-
-  let eSecs = 0;
-  const elapsedID = setInterval(() => { eSecs++; btnElapsed.textContent = fmtTimer(eSecs); }, 1000);
-
-  // Reset transcript/summary panes
-  document.getElementById('transPlaceholder').style.display = 'flex';
-  document.getElementById('transContent').style.display = 'none';
-  document.getElementById('transErr').style.display = 'none';
-  document.getElementById('sumPlaceholder').style.display = 'flex';
-  document.getElementById('sumLoading').style.display = 'none';
-  document.getElementById('sumContent').style.display = 'none';
-  document.getElementById('sumErr').style.display = 'none';
-  document.getElementById('statsBar').style.display = 'none';
-  const uttBadge = document.getElementById('uttBadge');
-  const sumBadge = document.getElementById('sumBadge');
-  uttBadge.style.display = 'none';
-  sumBadge.style.display = 'none';
-
-  const fd = new FormData();
-  const name = activeTab==='upload' ? (uploadedFile.name||'audio.wav') : 'recording.wav';
-  fd.append('audio', blob, name);
+  const fd=new FormData();
+  fd.append('audio', blob, activeTab==='upload'?(uploadedFile.name||'audio.wav'):'recording.wav');
 
   try {
-    const resp = await fetch('/transcribe', { method:'POST', body:fd });
-    const raw  = await resp.text();
-    let data;
-    try { data = JSON.parse(raw); }
-    catch { showTransErr(`Server returned non-JSON (HTTP ${resp.status}).<pre style="font-size:11px;margin-top:8px;">${esc(raw.slice(0,500))}</pre>`); return; }
-
-    if (data.status !== 'ok') { showTransErr(data.detail || 'Unknown error'); return; }
-
+    const resp=await fetch('/transcribe',{method:'POST',body:fd});
+    const raw=await resp.text(); let data;
+    try{data=JSON.parse(raw);}catch{showTransErr(`Server returned non-JSON (HTTP ${resp.status}).<pre style="font-size:11px;margin-top:8px;">${esc(raw.slice(0,500))}</pre>`);return;}
+    if(data.status!=='ok'){showTransErr(data.detail||'Unknown error');return;}
     renderTranscript(data.transcript);
-
-    // Kick off summarization
-    const plainText = data.transcript.map(t => `[Speaker ${t.speaker}]: ${t.text}`).join('\n');
+    const plainText=data.transcript.map(t=>`[Speaker ${t.speaker}]: ${t.text}`).join('\n');
     triggerSummarize(plainText);
-
-  } catch(e) {
-    showTransErr(e.message);
-  } finally {
-    clearInterval(elapsedID);
-    btn.disabled = false;
-    btnIcon.textContent = '\u25B6';
-    btnLabel.textContent = 'Run Pipeline';
-    btnElapsed.style.display = 'none';
-    syncBtn();
+  } catch(e) { showTransErr(e.message); }
+  finally {
+    clearInterval(elID); btn.disabled=false;
+    btnIcon.textContent='\u25B6'; btnLabel.textContent='Run Pipeline';
+    btnElapsed.style.display='none'; syncBtn();
   }
 });
 
-// ─── Render transcript ────────────────────────────────────
 function renderTranscript(tr) {
-  if (!tr || !tr.length) { showTransErr('No speech detected in the audio.'); return; }
-
-  const speakers = [...new Set(tr.map(t => t.speaker))].sort();
-  const cmap = {}; speakers.forEach((s,i) => { cmap[s] = PALETTE[i % PALETTE.length]; });
-  const total = Math.max(...tr.map(t => t.end));
-
-  // Stats
-  const sb = document.getElementById('statsBar');
-  sb.innerHTML = si('Duration', ft(total)) + si('Speakers', speakers.length) + si('Utterances', tr.length);
-  sb.style.display = 'flex';
-
-  // Badge
-  const uttBadge = document.getElementById('uttBadge');
-  uttBadge.textContent = tr.length; uttBadge.style.display = 'inline-flex';
-
-  // Legend
-  document.getElementById('spkLegend').innerHTML = speakers.map(s => {
-    const c = cmap[s];
-    return `<div class="spk-chip" style="background:${c.bg};border:1px solid ${c.bd};">
-      <div class="spk-dot" style="background:${c.fg};"></div>
-      <span style="color:${c.fg};">Speaker ${s}</span>
-    </div>`;
+  if(!tr||!tr.length){showTransErr('No speech detected.');return;}
+  const speakers=[...new Set(tr.map(t=>t.speaker))].sort();
+  const cmap={}; speakers.forEach((s,i)=>{cmap[s]=PALETTE[i%PALETTE.length];});
+  const total=Math.max(...tr.map(t=>t.end));
+  const sb=document.getElementById('statsBar');
+  sb.innerHTML=si('Duration',ft(total))+si('Speakers',speakers.length)+si('Utterances',tr.length);
+  sb.style.display='flex';
+  const ub=document.getElementById('uttBadge'); ub.textContent=tr.length; ub.style.display='inline-flex';
+  document.getElementById('spkLegend').innerHTML=speakers.map(s=>{const c=cmap[s];
+    return `<div class="spk-chip" style="background:${c.bg};border:1px solid ${c.bd};"><div class="spk-dot" style="background:${c.fg};"></div><span style="color:${c.fg};">Speaker ${s}</span></div>`;
   }).join('');
-
-  // Utterances
-  document.getElementById('utterances').innerHTML = tr.map(t => {
-    const c = cmap[t.speaker];
+  document.getElementById('utterances').innerHTML=tr.map(t=>{const c=cmap[t.speaker];
     return `<div class="utt" style="background:${c.bg};border-left-color:${c.fg};">
-      <div class="utt-meta">
-        <div class="utt-spk" style="color:${c.fg};">Spk ${t.speaker}</div>
-        <div class="utt-time">${ft(t.start)}</div>
-        <div class="utt-time">\u2193 ${ft(t.end)}</div>
-      </div>
-      <div class="utt-text">${esc(t.text)}</div>
-    </div>`;
+      <div class="utt-meta"><div class="utt-spk" style="color:${c.fg};">Spk ${t.speaker}</div><div class="utt-time">${ft(t.start)}</div><div class="utt-time">\u2193 ${ft(t.end)}</div></div>
+      <div class="utt-text">${esc(t.text)}</div></div>`;
   }).join('');
-
-  document.getElementById('transPlaceholder').style.display = 'none';
-  document.getElementById('transContent').style.display = 'block';
-
-  unlockTab('transcript');
-  switchGTab('transcript');
-  document.getElementById('gpane-transcript').scrollTop = 0;
+  document.getElementById('transPlaceholder').style.display='none';
+  document.getElementById('transContent').style.display='block';
+  unlockTab('transcript'); switchGTab('transcript');
+  document.getElementById('gpane-transcript').scrollTop=0;
 }
 
-function si(label, val) {
-  return `<div class="stat-item"><div class="stat-lbl">${label}</div><div class="stat-num">${val}</div></div>`;
+function si(label,val){return `<div class="stat-item"><div class="stat-lbl">${label}</div><div class="stat-num">${val}</div></div>`;}
+
+function showTransErr(msg){
+  unlockTab('transcript'); switchGTab('transcript');
+  document.getElementById('transPlaceholder').style.display='none';
+  document.getElementById('transErr').style.display='block';
+  document.getElementById('transErr').innerHTML=`<div class="err-card"><strong>Error:</strong> ${msg}</div>`;
 }
 
-function showTransErr(msg) {
-  unlockTab('transcript');
-  switchGTab('transcript');
-  document.getElementById('transPlaceholder').style.display = 'none';
-  document.getElementById('transErr').style.display = 'block';
-  document.getElementById('transErr').innerHTML = `<div class="err-card"><strong>Error:</strong> ${msg}</div>`;
-}
-
-// ─── Summarize ────────────────────────────────────────────
 async function triggerSummarize(text) {
   unlockTab('summary');
-
-  const sumBadge = document.getElementById('sumBadge');
-  sumBadge.className = 'gtab-badge spin'; sumBadge.textContent = ''; sumBadge.style.display = 'inline-flex';
-  document.getElementById('sumPlaceholder').style.display = 'none';
-  document.getElementById('sumLoading').style.display = 'flex';
-
+  const sb=document.getElementById('sumBadge');
+  sb.className='gtab-badge spin'; sb.textContent=''; sb.style.display='inline-flex';
+  document.getElementById('sumPlaceholder').style.display='none';
+  document.getElementById('sumLoading').style.display='flex';
   try {
-    const resp = await fetch('/summarize', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ text }),
-    });
-    const data = await resp.json();
-    sumBadge.className = 'gtab-badge';
-
-    if (data.status === 'ok') {
-      sumBadge.textContent = '\u2713';
-      renderSummary(data.summary);
-    } else {
-      sumBadge.textContent = '!'; sumBadge.style.background = '#FEE2E2'; sumBadge.style.color = '#DC2626';
-      showSumErr(data.detail || 'Summarization failed.');
-    }
-  } catch(e) {
-    sumBadge.className = 'gtab-badge'; sumBadge.textContent = '!';
-    showSumErr(e.message);
-  }
+    const data=await fetch('/summarize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})}).then(r=>r.json());
+    sb.className='gtab-badge';
+    if(data.status==='ok'){sb.textContent='\u2713';renderSummary(data.summary);}
+    else{sb.textContent='!';sb.style.background='#FEE2E2';sb.style.color='#DC2626';showSumErr(data.detail||'Summarization failed.');}
+  } catch(e){sb.className='gtab-badge';sb.textContent='!';showSumErr(e.message);}
 }
 
-function renderSummary(text) {
-  const wordCount = text.trim().split(/\s+/).length;
-  document.getElementById('sumLoading').style.display = 'none';
-  document.getElementById('sumContent').style.display = 'block';
-  document.getElementById('sumContent').innerHTML = `
+function renderSummary(text){
+  const wc=text.trim().split(/\s+/).length;
+  document.getElementById('sumLoading').style.display='none';
+  document.getElementById('sumContent').style.display='block';
+  document.getElementById('sumContent').innerHTML=`
     <div class="sum-card">
-      <div class="sum-card-hdr">
-        <div class="sum-card-title">Conversation Summary</div>
-      </div>
+      <div class="sum-card-hdr"><div class="sum-card-title">Conversation Summary</div></div>
       <div class="sum-body">${esc(text)}</div>
-      <div class="sum-footer">
-        <span>${wordCount} words</span>
-        <span>Generated ${new Date().toLocaleTimeString()}</span>
-      </div>
+      <div class="sum-footer"><span>${wc} words</span><span>Generated ${new Date().toLocaleTimeString()}</span></div>
     </div>`;
 }
 
-function showSumErr(msg) {
-  document.getElementById('sumLoading').style.display = 'none';
-  document.getElementById('sumErr').style.display = 'block';
-  document.getElementById('sumErr').innerHTML = `<div class="err-card"><strong>Summarization error:</strong> ${esc(msg)}</div>`;
+function showSumErr(msg){
+  document.getElementById('sumLoading').style.display='none';
+  document.getElementById('sumErr').style.display='block';
+  document.getElementById('sumErr').innerHTML=`<div class="err-card"><strong>Summarization error:</strong> ${esc(msg)}</div>`;
 }
 
-// ─── Helpers ──────────────────────────────────────────────
-function ft(s) {
-  const m = Math.floor(s/60); const sec = (s%60).toFixed(1);
-  return m > 0 ? `${m}:${String(Math.floor(s%60)).padStart(2,'0')}` : `${sec}s`;
-}
-function esc(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+function ft(s){const m=Math.floor(s/60);return m>0?`${m}:${String(Math.floor(s%60)).padStart(2,'0')}`:`${(s%60).toFixed(1)}s`;}
+function esc(str){return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 </body>
 </html>
