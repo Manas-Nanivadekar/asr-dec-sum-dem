@@ -126,6 +126,7 @@ pipeline = DiCoIndicPipeline(
     asr_model, diarization_pipeline=diar_pipeline, device=device
 )
 
-audio_file = "179729.wav"
-result = pipeline.transcribe(audio_file)
-print(result)
+if __name__ == "__main__":
+    audio_file = "179729.wav"
+    result = pipeline.transcribe(audio_file)
+    print(result)
