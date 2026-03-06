@@ -28,11 +28,11 @@ SUMMARIZATION_CONFIG = {
         "gt_summary": "gt_summary",
     },
     "model": {
-        "name": "meta-llama/Llama-3.2-3B-Instruct",
-        "torch_dtype": "float16",
+        "name": "openai/gpt-oss-20b",
+        "torch_dtype": "auto",
         "device": "cuda",
         "device_map": "auto",
-        "hf_token": "<---------------Paste-Your-HF-Token-for-LLAMA-3.2-3B-Instruct-Model-Here--------------->",
+        "hf_token": "",
         "low_cpu_mem_usage": True,
     },
     "inference": {
@@ -174,16 +174,15 @@ pipeline = DiCoIndicPipeline(
 )
 
 # -------------------------------
-# Summarization Model (Llama-3.2-3B-Instruct)
+# Summarization Model (GPT-OSS-20B)
 # -------------------------------
 
 print(f"Loading summarization model ({SUMMARIZATION_CONFIG['model']['name']})...")
 
-_sum_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 _sum_model_token = HF_TOKEN
 if not _sum_model_token:
     cfg_token = SUMMARIZATION_CONFIG["model"]["hf_token"]
-    if "Paste-Your-HF-Token" not in cfg_token:
+    if cfg_token and "Paste-Your-HF-Token" not in cfg_token:
         _sum_model_token = cfg_token
 
 sum_tokenizer = AutoTokenizer.from_pretrained(
@@ -192,7 +191,7 @@ sum_tokenizer = AutoTokenizer.from_pretrained(
 )
 _sum_model_kwargs = {
     "token": _sum_model_token,
-    "torch_dtype": _sum_dtype,
+    "torch_dtype": SUMMARIZATION_CONFIG["model"]["torch_dtype"],
     "low_cpu_mem_usage": SUMMARIZATION_CONFIG["model"]["low_cpu_mem_usage"],
 }
 if torch.cuda.is_available():
