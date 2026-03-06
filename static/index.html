@@ -27,18 +27,18 @@
       background: #fff;
       border-bottom: 1px solid #E2E8F0;
       padding: 0 36px;
-      height: 84px;
+      height: 100px;
       display: flex; align-items: center; justify-content: space-between;
     }
     .identity-left { display: flex; align-items: center; gap: 20px; }
-    .id-logo { height: 76px; width: auto; object-fit: contain; }
-    .id-divider { width: 1px; height: 48px; background: #E2E8F0; }
+    .id-logo { height: 92px; width: auto; object-fit: contain; }
+    .id-divider { width: 1px; height: 56px; background: #E2E8F0; }
     .id-text-group { display: flex; flex-direction: column; gap: 3px; }
     .id-institute { font-size: 18px; font-weight: 700; color: #1B4D8E; letter-spacing: -0.2px; }
     .id-lab       { font-size: 13px; color: #64748B; font-weight: 500; }
 
     .identity-right { display: flex; align-items: center; gap: 20px; }
-    .leap-logo { height: 58px; width: auto; object-fit: contain; }
+    .leap-logo { height: 72px; width: auto; object-fit: contain; }
     .openday-badge {
       display: flex; align-items: center; gap: 8px;
       background: #1B4D8E; color: #fff;
@@ -132,7 +132,7 @@
       width: 62px; height: 62px; border-radius: 50%;
       border: none; cursor: pointer; outline: none; z-index: 1;
       display: flex; align-items: center; justify-content: center;
-      font-size: 22px; transition: transform .15s, box-shadow .15s;
+      color: white; transition: transform .15s, box-shadow .15s;
     }
     .mic-btn.idle {
       background: linear-gradient(135deg, #1B4D8E, #2563EB);
@@ -345,15 +345,22 @@
     <div class="panel-section">
       <div class="section-heading">Audio Input</div>
       <div class="input-tabs">
-        <button class="itab active" data-tab="record">&#127897;&nbsp; Record</button>
-        <button class="itab"        data-tab="upload">&#128193;&nbsp; Upload</button>
+        <button class="itab active" data-tab="record">Record</button>
+        <button class="itab"        data-tab="upload">Upload</button>
       </div>
 
       <div class="itab-pane active" id="pane-record">
         <div class="record-area">
           <div class="mic-ring" id="micRing">
             <div class="mic-ring-outer"></div>
-            <button class="mic-btn idle" id="micBtn">&#127897;</button>
+            <button class="mic-btn idle" id="micBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="12" rx="3"/>
+            <path d="M5 10a7 7 0 0 0 14 0"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+          </svg>
+        </button>
           </div>
           <div class="rec-label" id="recStatus">Click to start recording</div>
           <div class="rec-timer" id="recTimer">0:00</div>
@@ -363,13 +370,11 @@
 
       <div class="itab-pane" id="pane-upload">
         <div class="drop-zone" id="dropZone">
-          <div class="dz-icon">&#127925;</div>
           <div class="dz-label">Drop audio file here</div>
           <div class="dz-hint">or click to browse &middot; WAV &middot; MP3 &middot; M4A &middot; OGG</div>
           <input type="file" id="fileInput" accept="audio/*" style="display:none" />
         </div>
         <div class="file-badge" id="fileBadge">
-          <span>&#128196;</span>
           <span class="fname" id="fileName"></span>
         </div>
       </div>
@@ -388,7 +393,7 @@
   <div class="right">
 
     <div class="global-tabs">
-      <button class="gtab active" data-gtab="script">&#128218;&nbsp; Script</button>
+      <button class="gtab active" data-gtab="script">Script</button>
       <button class="gtab locked" data-gtab="transcript" id="tabTranscript">
         Transcript <span class="gtab-badge" id="uttBadge" style="display:none;"></span>
       </button>
@@ -420,7 +425,6 @@
       <div class="gpane" id="gpane-transcript">
         <div class="trans-wrap">
           <div class="pane-placeholder" id="transPlaceholder">
-            <div class="ph-ico">&#128221;</div>
             <p>Run the pipeline to see the<br>diarized transcript here.</p>
           </div>
           <div id="transContent" style="display:none;">
@@ -435,8 +439,7 @@
       <div class="gpane" id="gpane-summary">
         <div class="sum-wrap">
           <div class="pane-placeholder" id="sumPlaceholder">
-            <div class="ph-ico">&#129302;</div>
-            <p>Run the pipeline to generate<br>an AI summary of the conversation.</p>
+            <p>Run the pipeline to generate<br>a summary of the conversation.</p>
           </div>
           <div class="sum-loading" id="sumLoading" style="display:none;">
             <div class="sum-spinner"></div>
@@ -545,7 +548,7 @@ async function startRec() {
   isRecording = true; recordedBlob = null;
   audioPreview.classList.remove('visible');
   micRing.classList.add('recording');
-  micBtn.className = 'mic-btn recording'; micBtn.textContent = '\u23F9';
+  micBtn.className = 'mic-btn recording'; micBtn.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>';
   recStatus.className = 'rec-label live'; recStatus.textContent = 'Recording\u2026';
   recTimer.classList.add('visible');
   timerSecs = 0; recTimer.textContent = fmtTimer(0);
@@ -563,7 +566,7 @@ async function stopRec() {
   audioPreview.src = URL.createObjectURL(recordedBlob);
   audioPreview.classList.add('visible');
   micRing.classList.remove('recording');
-  micBtn.className = 'mic-btn idle'; micBtn.textContent = '\u{1F399}';
+  micBtn.className = 'mic-btn idle'; micBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="8" y1="21" x2="16" y2="21"/></svg>';
   recStatus.className = 'rec-label'; recStatus.textContent = `Recorded ${fmtTimer(timerSecs)} \u2014 ready`;
   syncBtn();
 }
