@@ -249,6 +249,12 @@ def _extract_tag(text: str, tag: str) -> str:
     return " ".join(match.group(1).strip().split())
 
 
+def _strip_speaker_tags(text: str) -> str:
+    text = re.sub(r"\[speaker\s*\d+\]\s*:\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bspk\s*\d+\s*[:\-]\s*", "", text, flags=re.IGNORECASE)
+    return " ".join(text.split())
+
+
 _MEDICAL_KEYWORDS = {
     # English
     "doctor", "hospital", "clinic", "medicine", "medication", "tablet", "dose",
@@ -291,9 +297,26 @@ def _extract_clinical_indicators(text: str) -> str:
         r"\b(?:pulse|heart rate)\s*[:\-]?\s*\d{2,3}\s*(?:bpm)?\b",
         r"\b(?:hb|hemoglobin)\s*[:\-]?\s*\d{1,2}(?:\.\d+)?\b",
     ]
+    normalized = text.lower()
+    context_flags = {
+        "hemoglobin_like": any(k in normalized for k in ("iron", "hb", "hemoglobin", "anemia", "आयरन", "हीमोग्लोबिन", "खून की कमी")),
+    }
     hits = []
     for p in patterns:
         hits.extend(re.findall(p, text, flags=re.IGNORECASE))
+
+    # Handle spoken decimals often seen in ASR: "ग्यारह पॉइंट आठ", "11 point 8"
+    spoken_decimals = re.findall(
+        r"\b\d{1,2}\s*(?:point|पॉइंट)\s*\d{1,2}\b",
+        text,
+        flags=re.IGNORECASE,
+    )
+    for val in spoken_decimals:
+        if context_flags["hemoglobin_like"]:
+            hits.append(f"Hemoglobin ~ {val}")
+        else:
+            hits.append(val)
+
     cleaned = []
     for h in hits:
         v = " ".join(str(h).split())
@@ -322,16 +345,22 @@ def _extract_doctor_guidance(text: str) -> str:
             break
     if not picks:
         return "NA"
-    return " ".join(picks)
+    out = " ".join(picks)
+    out = _strip_speaker_tags(out)
+    # Remove filler fragments and keep concise advice output.
+    out = re.sub(r"\s{2,}", " ", out).strip(" -;,.")
+    return out if out else "NA"
 
 
 def _generate_medical_fields(transcript_text: str, model_device: torch.device) -> dict[str, str]:
+    clean_text = _strip_speaker_tags(transcript_text)
     prompt = (
         "You are extracting fields from a medical conversation transcript.\n"
+        "Write concise, non-repetitive content. Do not copy speaker labels.\n"
         "Return only these tags and nothing else:\n"
         "<DOCTOR_ADVICE>Concise doctor guidance, if present else NA</DOCTOR_ADVICE>\n"
         "<CLINICAL_INDICATORS>Clinical measurements/findings (BP/sugar/SPO2/etc.) else NA</CLINICAL_INDICATORS>\n\n"
-        f"Transcript:\n{transcript_text}"
+        f"Transcript:\n{clean_text}"
     )
     messages = [
         {"role": "system", "content": "Return clean tagged output only."},
@@ -355,8 +384,8 @@ def _generate_medical_fields(transcript_text: str, model_device: torch.device) -
         )
     raw = sum_tokenizer.decode(out[0][ids.shape[1] :], skip_special_tokens=True).strip()
     return {
-        "DOCTOR_ADVICE": _extract_tag(raw, "DOCTOR_ADVICE") or "NA",
-        "CLINICAL_INDICATORS": _extract_tag(raw, "CLINICAL_INDICATORS") or "NA",
+        "DOCTOR_ADVICE": _strip_speaker_tags(_extract_tag(raw, "DOCTOR_ADVICE")) or "NA",
+        "CLINICAL_INDICATORS": _strip_speaker_tags(_extract_tag(raw, "CLINICAL_INDICATORS")) or "NA",
     }
 
 
@@ -377,8 +406,8 @@ def _clean_structured_summary(
     sections["DOMAIN"] = "MEDICAL" if is_medical else "GENERAL"
 
     if sections["DOMAIN"] == "MEDICAL":
-        sections["DOCTOR_ADVICE"] = sections["DOCTOR_ADVICE"] or "NA"
-        sections["CLINICAL_INDICATORS"] = sections["CLINICAL_INDICATORS"] or "NA"
+        sections["DOCTOR_ADVICE"] = _strip_speaker_tags(sections["DOCTOR_ADVICE"] or "NA")
+        sections["CLINICAL_INDICATORS"] = _strip_speaker_tags(sections["CLINICAL_INDICATORS"] or "NA")
         if sections["DOCTOR_ADVICE"] == "NA" or sections["CLINICAL_INDICATORS"] == "NA":
             gen = _generate_medical_fields(transcript_text, model_device)
             if sections["DOCTOR_ADVICE"] == "NA":
