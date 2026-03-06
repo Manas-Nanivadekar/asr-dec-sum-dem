@@ -537,11 +537,25 @@ document.getElementById('btnGo').addEventListener('click', async () => {
   fd.append('audio', blob, name);
 
   try {
+    console.log('[transcribe] Sending request…');
     const resp = await fetch('/transcribe', { method:'POST', body:fd });
-    const data = await resp.json();
+    console.log(`[transcribe] HTTP ${resp.status} ${resp.statusText}`);
+
+    const raw = await resp.text();
+    console.log('[transcribe] Raw response (first 300 chars):', raw.slice(0, 300));
+
+    let data;
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      renderErr(`Server returned non-JSON (HTTP ${resp.status}).<br><pre style="font-size:11px;overflow:auto;margin-top:8px;">${esc(raw.slice(0, 500))}</pre>`);
+      return;
+    }
+
     if (data.status === 'ok') render(data.transcript);
     else                       renderErr(data.detail || data.message || 'Unknown error');
   } catch(e) {
+    console.error('[transcribe] Fetch failed:', e);
     renderErr(e.message);
   } finally {
     clearInterval(elapsedID);
