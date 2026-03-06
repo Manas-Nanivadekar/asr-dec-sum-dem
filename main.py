@@ -167,11 +167,12 @@ def summarize_transcript(transcript_text: str) -> str:
         {"role": "user",   "content": f"Transcript:\n\n{transcript_text}\n\nSummary:"},
     ]
 
-    token_ids = sum_tokenizer.apply_chat_template(
+    formatted = sum_tokenizer.apply_chat_template(
         messages,
         add_generation_prompt=True,
+        tokenize=False,
     )
-    input_ids = torch.tensor([token_ids], dtype=torch.long).to(device)
+    input_ids = sum_tokenizer(formatted, return_tensors="pt").input_ids.to(device)
 
     with torch.no_grad():
         output_ids = sum_model.generate(
