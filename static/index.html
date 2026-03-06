@@ -103,6 +103,15 @@
         height: 86px;
         position: relative;
       }
+      .leap-constellation {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0.95;
+      }
       .leap-logo-img {
         width: 100%;
         height: 100%;
@@ -110,53 +119,7 @@
         object-fit: cover;
         object-position: center center;
         position: relative;
-        z-index: 2;
-        animation: leap-logo-drift 3.2s ease-in-out infinite;
-      }
-      .leap-logo-frame::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(
-          105deg,
-          rgba(255, 255, 255, 0) 30%,
-          rgba(147, 197, 253, 0.28) 47%,
-          rgba(255, 255, 255, 0) 64%
-        );
-        transform: translateX(-115%);
-        animation: leap-logo-shine 3.2s ease-in-out infinite;
         z-index: 3;
-        pointer-events: none;
-      }
-      @keyframes leap-logo-drift {
-        0%,
-        100% {
-          transform: translateX(0) scale(1);
-          filter: drop-shadow(0 0 0 rgba(37, 99, 235, 0));
-        }
-        35% {
-          transform: translateX(1.5px) scale(1.01);
-          filter: drop-shadow(0 1px 2px rgba(37, 99, 235, 0.2));
-        }
-        65% {
-          transform: translateX(-1px) scale(1.005);
-          filter: drop-shadow(0 1px 2px rgba(37, 99, 235, 0.14));
-        }
-      }
-      @keyframes leap-logo-shine {
-        0%,
-        55%,
-        100% {
-          transform: translateX(-115%);
-          opacity: 0;
-        }
-        65% {
-          opacity: 1;
-        }
-        85% {
-          transform: translateX(115%);
-          opacity: 0.65;
-        }
       }
       .openday-badge {
         display: flex;
@@ -200,9 +163,8 @@
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        .leap-logo-img,
-        .leap-logo-frame::after {
-          animation: none;
+        .leap-constellation {
+          display: none;
         }
       }
 
@@ -921,6 +883,7 @@
       </div>
       <div class="identity-right">
         <div class="logo-frame leap-logo-frame">
+          <canvas class="leap-constellation" id="leapConstellation"></canvas>
           <img class="leap-logo-img" src="/assets/leap-1.png" alt="LEAP Lab" />
         </div>
         <div class="openday-badge">Open Day <span>2026</span></div>
@@ -1123,6 +1086,101 @@
       let audioChunks = [],
         timerSecs = 0,
         timerID = null;
+
+      initLeapConstellation();
+
+      function initLeapConstellation() {
+        const canvas = document.getElementById("leapConstellation");
+        const frame = canvas?.closest(".leap-logo-frame");
+        if (!canvas || !frame) return;
+        if (
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
+          return;
+        }
+
+        const ctx = canvas.getContext("2d");
+        const points = [];
+        const pointCount = 7;
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        let width = 0;
+        let height = 0;
+        let rafId = 0;
+        let start = performance.now();
+
+        function resize() {
+          width = frame.clientWidth;
+          height = frame.clientHeight;
+          canvas.width = Math.max(1, Math.floor(width * dpr));
+          canvas.height = Math.max(1, Math.floor(height * dpr));
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function initPoints() {
+          points.length = 0;
+          for (let i = 0; i < pointCount; i++) {
+            points.push({
+              bx: width * (0.14 + 0.74 * Math.random()),
+              by: height * (0.2 + 0.6 * Math.random()),
+              r: 2.8 + Math.random() * 1.6,
+              ampX: 3 + Math.random() * 6,
+              ampY: 2 + Math.random() * 5,
+              speed: 0.45 + Math.random() * 0.55,
+              phase: Math.random() * Math.PI * 2,
+            });
+          }
+        }
+
+        function draw(ts) {
+          const t = (ts - start) / 1000;
+          ctx.clearRect(0, 0, width, height);
+
+          const live = points.map((p) => ({
+            x: p.bx + Math.sin(t * p.speed + p.phase) * p.ampX,
+            y: p.by + Math.cos(t * p.speed * 1.12 + p.phase) * p.ampY,
+            r: p.r,
+          }));
+
+          // Lines
+          ctx.lineWidth = 1;
+          for (let i = 0; i < live.length; i++) {
+            for (let j = i + 1; j < live.length; j++) {
+              const dx = live[i].x - live[j].x;
+              const dy = live[i].y - live[j].y;
+              const dist = Math.hypot(dx, dy);
+              if (dist > 66) continue;
+              const alpha = (1 - dist / 66) * 0.35;
+              ctx.strokeStyle = `rgba(59, 130, 246, ${alpha.toFixed(3)})`;
+              ctx.beginPath();
+              ctx.moveTo(live[i].x, live[i].y);
+              ctx.lineTo(live[j].x, live[j].y);
+              ctx.stroke();
+            }
+          }
+
+          // Dots
+          for (const p of live) {
+            ctx.fillStyle = "rgba(96, 165, 250, 0.95)";
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          rafId = requestAnimationFrame(draw);
+        }
+
+        resize();
+        initPoints();
+        rafId = requestAnimationFrame(draw);
+        window.addEventListener("resize", () => {
+          cancelAnimationFrame(rafId);
+          resize();
+          initPoints();
+          start = performance.now();
+          rafId = requestAnimationFrame(draw);
+        });
+      }
 
       // ── Load script ───────────────────────────────────────────
       (async () => {
