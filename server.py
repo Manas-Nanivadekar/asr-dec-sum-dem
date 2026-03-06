@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import JSONResponse, FileResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from pydantic import BaseModel
 
 # ── Logging setup ─────────────────────────────────────────
 logging.basicConfig(
@@ -19,8 +20,8 @@ log = logging.getLogger("server")
 
 # ── Load pipeline (models load here at startup) ───────────
 log.info("Importing pipeline from main.py …")
-from main import pipeline
-log.info("Pipeline ready.")
+from main import pipeline, summarize_transcript
+log.info("All models ready.")
 
 app = FastAPI()
 
@@ -114,6 +115,27 @@ async def transcribe(audio: UploadFile = File(...)):
                 os.unlink(path)
             except OSError:
                 pass
+
+
+# ── Summarize endpoint ────────────────────────────────────
+class SummarizeRequest(BaseModel):
+    text: str
+
+
+@app.post("/summarize")
+async def summarize(req: SummarizeRequest):
+    t0 = time.time()
+    if not req.text.strip():
+        return JSONResponse({"status": "error", "detail": "Empty transcript text."}, status_code=400)
+
+    log.info(f"Summarization request: {len(req.text)} chars")
+    try:
+        summary = summarize_transcript(req.text)
+        log.info(f"Summarization done in {time.time()-t0:.1f}s  ({len(summary)} chars)")
+        return JSONResponse({"status": "ok", "summary": summary})
+    except Exception as e:
+        log.exception("Summarization failed")
+        return JSONResponse({"status": "error", "detail": str(e)}, status_code=500)
 
 
 # ── Entry point ───────────────────────────────────────────

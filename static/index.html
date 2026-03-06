@@ -1,22 +1,22 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Indic Speech — ASR + Diarization</title>
+  <title>IndicSpeech Lab — ASR + Diarization + Summarization</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
     rel="stylesheet"
   />
   <style>
-    /* ── Reset ──────────────────────────────────────── */
+    /* ── Reset ──────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
 
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: #F1F5F9;
+      background: #F8FAFC;
       color: #0F172A;
       display: flex;
       flex-direction: column;
@@ -24,37 +24,71 @@
       overflow: hidden;
     }
 
-    /* ── Header ─────────────────────────────────────── */
+    /* ── Header ─────────────────────────────────────────── */
     header {
       flex-shrink: 0;
-      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+      background: #0F172A;
       color: white;
-      padding: 14px 28px;
+      padding: 0 32px;
+      height: 58px;
       display: flex;
       align-items: center;
-      gap: 14px;
-      box-shadow: 0 2px 16px rgba(79, 70, 229, 0.35);
-      z-index: 10;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
     }
-    .header-icon {
-      width: 38px; height: 38px;
-      background: rgba(255,255,255,0.18);
-      border-radius: 10px;
+    .header-left {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .header-logo {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #6366F1, #8B5CF6);
+      border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px;
+      font-size: 16px; flex-shrink: 0;
     }
-    header h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
-    header p  { font-size: 12px; opacity: 0.7; margin-top: 1px; }
+    .header-title {
+      font-size: 15px; font-weight: 700;
+      letter-spacing: -0.2px;
+    }
+    .header-sub {
+      font-size: 11px; color: rgba(255,255,255,0.45);
+      margin-top: 1px; font-weight: 400;
+    }
+    .header-divider {
+      width: 1px; height: 28px;
+      background: rgba(255,255,255,0.12);
+    }
+    .header-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(99,102,241,0.2);
+      border: 1px solid rgba(99,102,241,0.35);
+      border-radius: 20px;
+      padding: 3px 10px 3px 6px;
+      font-size: 11px; font-weight: 600; color: #A5B4FC;
+    }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #6EE7B7;
+      box-shadow: 0 0 0 2px rgba(110,231,183,0.3);
+    }
+    .header-right {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .header-model-tag {
+      font-size: 11px; color: rgba(255,255,255,0.35);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0;
+    }
 
-    /* ── Layout ─────────────────────────────────────── */
+    /* ── Layout ─────────────────────────────────────────── */
     .layout {
       flex: 1;
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 340px 1fr;
       overflow: hidden;
     }
 
-    /* ── Left Panel ─────────────────────────────────── */
+    /* ── Left Panel ─────────────────────────────────────── */
     .left {
       background: #fff;
       border-right: 1px solid #E2E8F0;
@@ -63,287 +97,514 @@
       overflow-y: auto;
     }
 
-    .section {
-      padding: 22px 24px;
+    .panel-section {
+      padding: 20px 20px;
       border-bottom: 1px solid #F1F5F9;
     }
-    .section-label {
-      font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .08em; color: #94A3B8; margin-bottom: 16px;
+    .panel-section:last-child { border-bottom: none; }
+
+    .section-heading {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: #94A3B8; margin-bottom: 14px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .section-heading::after {
+      content: ''; flex: 1; height: 1px; background: #F1F5F9;
     }
 
-    /* ── Tabs ───────────────────────────────────────── */
-    .tabs {
+    /* ── Input Tabs ─────────────────────────────────────── */
+    .input-tabs {
       display: flex;
       background: #F1F5F9;
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 3px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      gap: 2px;
     }
-    .tab {
-      flex: 1; padding: 8px 10px; text-align: center;
-      font-size: 13px; font-weight: 600; color: #64748B;
-      border-radius: 8px; cursor: pointer;
+    .itab {
+      flex: 1; padding: 7px 10px;
+      font-size: 12px; font-weight: 600; color: #64748B;
+      border-radius: 6px; cursor: pointer;
       transition: all .15s; user-select: none;
+      text-align: center; border: none; background: transparent;
     }
-    .tab.active {
-      background: #fff;
-      color: #4F46E5;
-      box-shadow: 0 1px 4px rgba(0,0,0,.1);
+    .itab.active {
+      background: #fff; color: #4F46E5;
+      box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 1px rgba(0,0,0,.04);
     }
-    .tab-pane { display: none; }
-    .tab-pane.active { display: block; }
+    .itab-pane { display: none; }
+    .itab-pane.active { display: block; }
 
-    /* ── Record ─────────────────────────────────────── */
+    /* ── Record ─────────────────────────────────────────── */
     .record-area {
       display: flex; flex-direction: column;
-      align-items: center; gap: 14px; padding: 8px 0;
+      align-items: center; gap: 12px; padding: 4px 0 8px;
     }
-
-    .mic-btn {
-      width: 82px; height: 82px; border-radius: 50%;
-      border: none; cursor: pointer; outline: none;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 30px; transition: transform .15s, box-shadow .15s;
+    .mic-ring {
       position: relative;
+      width: 80px; height: 80px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mic-ring-outer {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      border: 2px solid #E2E8F0;
+      transition: border-color .2s;
+    }
+    .mic-ring.recording .mic-ring-outer {
+      border-color: rgba(239,68,68,.4);
+      animation: ring-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes ring-pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.12); opacity: 0.5; }
+    }
+    .mic-btn {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: none; cursor: pointer; outline: none; z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; transition: transform .15s, box-shadow .15s;
     }
     .mic-btn.idle {
-      background: #4F46E5;
-      box-shadow: 0 4px 18px rgba(79,70,229,.45);
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      box-shadow: 0 4px 16px rgba(79,70,229,.4);
     }
     .mic-btn.idle:hover {
-      transform: scale(1.06);
-      box-shadow: 0 6px 24px rgba(79,70,229,.55);
+      transform: scale(1.05);
+      box-shadow: 0 6px 22px rgba(79,70,229,.5);
     }
     .mic-btn.recording {
-      background: #EF4444;
-      box-shadow: 0 0 0 0 rgba(239,68,68,.4);
-      animation: ripple 1.5s infinite;
+      background: linear-gradient(135deg, #EF4444, #DC2626);
+      box-shadow: 0 4px 16px rgba(239,68,68,.4);
     }
-    @keyframes ripple {
-      0%   { box-shadow: 0 0 0 0   rgba(239,68,68,.45); }
-      70%  { box-shadow: 0 0 0 18px rgba(239,68,68,0);   }
-      100% { box-shadow: 0 0 0 0   rgba(239,68,68,0);    }
+    .rec-label {
+      font-size: 12px; font-weight: 600; color: #64748B;
     }
-
-    .rec-status {
-      font-size: 13px; font-weight: 600; color: #64748B;
-    }
-    .rec-status.live { color: #EF4444; }
-
+    .rec-label.live { color: #EF4444; }
     .rec-timer {
-      font-size: 32px; font-weight: 800; letter-spacing: -1px;
-      font-variant-numeric: tabular-nums; color: #0F172A;
+      font-size: 28px; font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -1px; color: #0F172A;
       visibility: hidden;
     }
     .rec-timer.visible { visibility: visible; }
-
     .audio-preview {
-      width: 100%; height: 36px; border-radius: 8px;
-      display: none; margin-top: 4px;
+      width: 100%; height: 32px; border-radius: 6px;
+      display: none; margin-top: 2px;
     }
     .audio-preview.visible { display: block; }
 
-    /* ── Upload ─────────────────────────────────────── */
+    /* ── Upload ─────────────────────────────────────────── */
     .drop-zone {
-      border: 2px dashed #CBD5E1; border-radius: 12px;
-      padding: 28px 16px; text-align: center;
+      border: 1.5px dashed #CBD5E1; border-radius: 10px;
+      padding: 24px 16px; text-align: center;
       cursor: pointer; transition: all .2s;
+      background: #FAFAFA;
     }
     .drop-zone:hover, .drop-zone.over {
-      border-color: #4F46E5; background: #EEF2FF;
+      border-color: #6366F1; background: #EEF2FF;
     }
-    .drop-zone .dz-icon { font-size: 30px; margin-bottom: 8px; }
-    .drop-zone p   { font-size: 14px; color: #475569; }
-    .drop-zone span{ font-size: 12px; color: #94A3B8; display: block; margin-top: 3px; }
-
+    .dz-icon { font-size: 26px; margin-bottom: 8px; opacity: .7; }
+    .dz-label { font-size: 13px; color: #475569; font-weight: 500; }
+    .dz-hint { font-size: 11px; color: #94A3B8; margin-top: 3px; }
     .file-badge {
       display: none; align-items: center; gap: 8px;
       background: #F0FDF4; border: 1px solid #86EFAC;
-      border-radius: 8px; padding: 10px 14px;
-      margin-top: 12px; font-size: 13px; color: #15803D;
+      border-radius: 8px; padding: 9px 14px;
+      margin-top: 10px; font-size: 12px; color: #15803D; font-weight: 500;
     }
     .file-badge.visible { display: flex; }
-    .file-badge span:first-child { flex-shrink: 0; }
-    .file-badge .fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-    /* ── Transcribe button ──────────────────────────── */
-    .btn-go {
-      width: 100%; padding: 13px;
-      background: #4F46E5; color: white;
-      border: none; border-radius: 10px;
-      font-size: 15px; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 9px;
-      transition: background .15s, transform .15s, box-shadow .15s;
+    .file-badge .fname {
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
     }
-    .btn-go:hover:not(:disabled) {
-      background: #4338CA;
+
+    /* ── Pipeline config ─────────────────────────────────── */
+    .model-list { display: flex; flex-direction: column; gap: 8px; }
+    .model-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-radius: 8px;
+      border: 1px solid #F1F5F9; background: #FAFAFA;
+    }
+    .model-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    }
+    .model-name {
+      font-size: 11px; font-weight: 600; color: #334155;
+      font-family: 'JetBrains Mono', monospace;
+      flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .model-role {
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .06em; color: #94A3B8;
+    }
+
+    /* ── Transcribe button ──────────────────────────────── */
+    .btn-transcribe {
+      width: 100%; padding: 12px;
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      color: white;
+      border: none; border-radius: 9px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: opacity .15s, transform .15s, box-shadow .15s;
+      box-shadow: 0 2px 10px rgba(79,70,229,.35);
+      letter-spacing: -0.1px;
+    }
+    .btn-transcribe:hover:not(:disabled) {
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(79,70,229,.4);
+      box-shadow: 0 4px 18px rgba(79,70,229,.45);
     }
-    .btn-go:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .btn-transcribe:disabled { opacity: .4; cursor: not-allowed; transform: none; }
 
-    .spinner {
-      display: inline-block; width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,.35);
+    .spinner-white {
+      display: inline-block; width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.3);
       border-top-color: white; border-radius: 50%;
-      animation: spin .65s linear infinite;
+      animation: spin .6s linear infinite; flex-shrink: 0;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .elapsed {
-      font-size: 12px; color: rgba(255,255,255,.7);
-      font-weight: 500; font-variant-numeric: tabular-nums;
+    .elapsed-label {
+      font-size: 11px; color: rgba(255,255,255,.65);
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    /* ── Right Panel ────────────────────────────────── */
+    /* ── Right Panel ────────────────────────────────────── */
     .right {
-      overflow-y: auto;
-      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #F8FAFC;
     }
 
     /* placeholder */
     .placeholder {
-      height: 100%; display: flex;
+      flex: 1; display: flex;
       flex-direction: column; align-items: center; justify-content: center;
-      gap: 12px; color: #94A3B8; text-align: center;
+      gap: 14px; color: #94A3B8; text-align: center; padding: 40px;
     }
-    .placeholder .ph-ico { font-size: 52px; opacity: .25; }
-    .placeholder p { font-size: 15px; line-height: 1.7; }
-    .placeholder strong { color: #64748B; }
+    .ph-graphic {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #EEF2FF, #F5F3FF);
+      border: 1.5px solid #DDD6FE;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; opacity: .6;
+    }
+    .ph-title { font-size: 16px; font-weight: 700; color: #475569; }
+    .ph-sub { font-size: 13px; line-height: 1.6; color: #94A3B8; max-width: 260px; }
 
-    /* stats */
-    .stats {
-      display: flex; gap: 28px; flex-wrap: wrap;
-      padding: 14px 20px; background: #fff;
-      border-radius: 12px; border: 1px solid #E2E8F0;
-      box-shadow: 0 1px 4px rgba(0,0,0,.04);
-      margin-bottom: 16px;
-    }
-    .stat-label {
-      font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .07em; color: #94A3B8;
-    }
-    .stat-val {
-      font-size: 24px; font-weight: 800; color: #0F172A;
-      letter-spacing: -0.5px; margin-top: 2px;
+    /* ── Results area ───────────────────────────────────── */
+    .results-area {
+      flex: 1; display: flex; flex-direction: column; overflow: hidden;
     }
 
-    /* legend */
-    .legend {
-      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px;
+    /* stats bar */
+    .stats-bar {
+      flex-shrink: 0;
+      display: flex; gap: 0;
+      background: #fff;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 0 28px;
     }
-    .leg-chip {
-      display: flex; align-items: center; gap: 6px;
-      padding: 4px 12px 4px 8px; border-radius: 20px;
-      font-size: 12px; font-weight: 700;
+    .stat-item {
+      padding: 14px 24px 14px 0;
+      margin-right: 24px;
+      border-right: 1px solid #F1F5F9;
     }
-    .leg-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .stat-item:last-child { border-right: none; }
+    .stat-lbl {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em; color: #94A3B8;
+    }
+    .stat-num {
+      font-size: 22px; font-weight: 800;
+      color: #0F172A; letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+      margin-top: 1px;
+    }
 
-    /* utterances */
-    .utterances { display: flex; flex-direction: column; gap: 5px; }
+    /* result tabs */
+    .result-tabs {
+      flex-shrink: 0;
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 0 28px;
+      gap: 0;
+    }
+    .rtab {
+      padding: 11px 18px; font-size: 13px; font-weight: 600;
+      color: #64748B; border: none; background: transparent;
+      cursor: pointer; position: relative;
+      border-bottom: 2px solid transparent;
+      transition: color .15s;
+    }
+    .rtab:hover { color: #4F46E5; }
+    .rtab.active {
+      color: #4F46E5;
+      border-bottom-color: #4F46E5;
+    }
+    .rtab-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-left: 6px; width: 18px; height: 18px;
+      border-radius: 50%; font-size: 10px; font-weight: 700;
+      background: #EEF2FF; color: #4F46E5;
+    }
+    .rtab-badge.loading {
+      background: transparent;
+      border: 1.5px solid #CBD5E1;
+      border-top-color: #4F46E5;
+      animation: spin .6s linear infinite;
+    }
 
+    /* panes */
+    .rtab-pane { display: none; flex: 1; overflow-y: auto; padding: 22px 28px; }
+    .rtab-pane.active { display: block; }
+
+    /* ── Speaker legend ──────────────────────────────────── */
+    .spk-legend {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .spk-chip {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 10px 4px 7px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .spk-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Utterances ──────────────────────────────────────── */
+    .utterances { display: flex; flex-direction: column; gap: 3px; }
     .utt {
-      display: flex; align-items: flex-start; gap: 12px;
-      padding: 10px 14px; border-radius: 10px;
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 10px 14px; border-radius: 8px;
+      border-left: 3px solid transparent;
       transition: filter .1s;
     }
     .utt:hover { filter: brightness(.97); }
-
-    .utt-meta { min-width: 66px; flex-shrink: 0; }
-    .utt-spk  {
-      font-size: 11px; font-weight: 800; text-transform: uppercase;
-      letter-spacing: .05em;
+    .utt-meta { min-width: 58px; flex-shrink: 0; }
+    .utt-spk { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+    .utt-time {
+      font-size: 9.5px; color: #94A3B8; margin-top: 3px;
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
     }
-    .utt-t { font-size: 10px; color: #94A3B8; margin-top: 3px; font-variant-numeric: tabular-nums; }
-
     .utt-text {
-      font-size: 16px; line-height: 1.7; color: #1E293B; flex: 1;
+      font-size: 15px; line-height: 1.75; color: #1E293B; flex: 1;
       font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'Inter', sans-serif;
     }
 
-    /* error */
-    .err-card {
-      background: #FEF2F2; border: 1px solid #FCA5A5;
-      border-radius: 10px; padding: 16px 20px;
-      color: #DC2626; font-size: 14px;
+    /* ── Summary panel ──────────────────────────────────── */
+    .summary-loading-state {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; padding: 60px 20px;
+      color: #94A3B8;
+    }
+    .summary-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #E2E8F0;
+      border-top-color: #6366F1;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    .summary-loading-label { font-size: 14px; font-weight: 600; color: #475569; }
+    .summary-loading-sub { font-size: 12px; color: #94A3B8; }
+
+    .summary-card {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .summary-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid #F1F5F9;
+      background: #FAFAFA;
+    }
+    .summary-card-title {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em; color: #475569;
+    }
+    .summary-model-tag {
+      font-size: 10px; font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      color: #94A3B8;
+      background: #F1F5F9;
+      padding: 3px 8px; border-radius: 4px;
+    }
+    .summary-body {
+      padding: 20px;
+      font-size: 15px; line-height: 1.8;
+      color: #1E293B;
+      white-space: pre-wrap;
+    }
+    .summary-footer {
+      padding: 10px 20px;
+      border-top: 1px solid #F1F5F9;
+      font-size: 11px; color: #94A3B8;
+      display: flex; gap: 12px;
     }
 
-    /* ── Scrollbar ──────────────────────────────────── */
-    ::-webkit-scrollbar { width: 6px; }
+    /* ── Error card ──────────────────────────────────────── */
+    .err-card {
+      background: #FEF2F2; border: 1px solid #FECACA;
+      border-radius: 10px; padding: 16px 20px;
+      color: #DC2626; font-size: 13px; line-height: 1.6;
+    }
+    .err-card strong { font-weight: 700; }
+
+    /* ── Scrollbar ──────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
   </style>
 </head>
 <body>
 
-<!-- ─── Header ─────────────────────────────────────────── -->
+<!-- ─── Header ────────────────────────────────────────────── -->
 <header>
-  <div class="header-icon">🎙</div>
-  <div>
-    <h1>Indic Speech Transcription</h1>
-    <p>Speaker Diarization + Multilingual ASR</p>
+  <div class="header-left">
+    <div class="header-logo">&#127897;</div>
+    <div>
+      <div class="header-title">IndicSpeech Lab</div>
+      <div class="header-sub">ASR &middot; Speaker Diarization &middot; Summarization</div>
+    </div>
+    <div class="header-divider"></div>
+    <div class="header-badge">
+      <div class="badge-dot"></div>
+      Models loaded
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="header-model-tag">ai4bharat/indic-conformer-600m &nbsp;&bull;&nbsp; Llama-3.2-3B-Instruct</span>
   </div>
 </header>
 
-<!-- ─── Main Layout ────────────────────────────────────── -->
+<!-- ─── Layout ───────────────────────────────────────────── -->
 <div class="layout">
 
-  <!-- Left: input controls -->
+  <!-- Left: controls -->
   <div class="left">
-    <div class="section">
-      <div class="section-label">Audio Input</div>
+    <div class="panel-section">
+      <div class="section-heading">Audio Input</div>
 
-      <div class="tabs">
-        <div class="tab active" data-tab="record">🎙&nbsp; Record</div>
-        <div class="tab"        data-tab="upload">📂&nbsp; Upload</div>
+      <div class="input-tabs">
+        <button class="itab active" data-tab="record">&#127897; Record</button>
+        <button class="itab"        data-tab="upload">&#128193; Upload</button>
       </div>
 
       <!-- Record pane -->
-      <div class="tab-pane active" id="pane-record">
+      <div class="itab-pane active" id="pane-record">
         <div class="record-area">
-          <button class="mic-btn idle" id="micBtn">🎙</button>
-          <div class="rec-status" id="recStatus">Click to start recording</div>
-          <div class="rec-timer"  id="recTimer">0:00</div>
+          <div class="mic-ring" id="micRing">
+            <div class="mic-ring-outer"></div>
+            <button class="mic-btn idle" id="micBtn">&#127897;</button>
+          </div>
+          <div class="rec-label" id="recStatus">Click to start recording</div>
+          <div class="rec-timer" id="recTimer">0:00</div>
         </div>
         <audio class="audio-preview" id="audioPreview" controls></audio>
       </div>
 
       <!-- Upload pane -->
-      <div class="tab-pane" id="pane-upload">
+      <div class="itab-pane" id="pane-upload">
         <div class="drop-zone" id="dropZone">
-          <div class="dz-icon">🎵</div>
-          <p>Drop an audio file here</p>
-          <span>or click to browse &nbsp;(WAV · MP3 · M4A · OGG…)</span>
+          <div class="dz-icon">&#127925;</div>
+          <div class="dz-label">Drop audio file here</div>
+          <div class="dz-hint">or click to browse &nbsp;&middot;&nbsp; WAV &middot; MP3 &middot; M4A &middot; OGG</div>
           <input type="file" id="fileInput" accept="audio/*" style="display:none" />
         </div>
         <div class="file-badge" id="fileBadge">
-          <span>📄</span>
+          <span>&#128196;</span>
           <span class="fname" id="fileName"></span>
         </div>
       </div>
     </div>
 
-    <!-- Transcribe -->
-    <div class="section">
-      <button class="btn-go" id="btnGo" disabled>
-        <span id="btnIcon">▶</span>
-        <span id="btnLabel">Transcribe</span>
+    <!-- Pipeline models -->
+    <div class="panel-section">
+      <div class="section-heading">Pipeline</div>
+      <div class="model-list">
+        <div class="model-row">
+          <div class="model-dot" style="background:#6366F1;"></div>
+          <div class="model-name">diarizen-wavlm-large-s80</div>
+          <div class="model-role">Diar</div>
+        </div>
+        <div class="model-row">
+          <div class="model-dot" style="background:#0891B2;"></div>
+          <div class="model-name">indic-conformer-600m</div>
+          <div class="model-role">ASR</div>
+        </div>
+        <div class="model-row">
+          <div class="model-dot" style="background:#7C3AED;"></div>
+          <div class="model-name">Llama-3.2-3B-Instruct</div>
+          <div class="model-role">LLM</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Run button -->
+    <div class="panel-section" style="margin-top:auto;">
+      <button class="btn-transcribe" id="btnGo" disabled>
+        <span id="btnIcon">&#9654;</span>
+        <span id="btnLabel">Run Pipeline</span>
+        <span id="btnElapsed" class="elapsed-label" style="display:none;"></span>
       </button>
     </div>
   </div>
 
-  <!-- Right: transcript -->
+  <!-- Right: results -->
   <div class="right" id="rightPanel">
-    <div class="placeholder">
-      <div class="ph-ico">🗒️</div>
-      <p>Record or upload audio,<br>then click <strong>Transcribe</strong>.</p>
+    <!-- Placeholder -->
+    <div class="placeholder" id="placeholder">
+      <div class="ph-graphic">&#128221;</div>
+      <div class="ph-title">No results yet</div>
+      <div class="ph-sub">Record or upload an audio file, then click <strong>Run Pipeline</strong> to transcribe and summarize.</div>
     </div>
+
+    <!-- Results (hidden until first run) -->
+    <div class="results-area" id="resultsArea" style="display:none;">
+      <!-- Stats bar -->
+      <div class="stats-bar" id="statsBar"></div>
+
+      <!-- Tab bar -->
+      <div class="result-tabs">
+        <button class="rtab active" data-rtab="transcript">
+          Transcript <span class="rtab-badge" id="uttCount">0</span>
+        </button>
+        <button class="rtab" data-rtab="summary">
+          AI Summary <span class="rtab-badge" id="sumBadge"></span>
+        </button>
+      </div>
+
+      <!-- Transcript pane -->
+      <div class="rtab-pane active" id="rpane-transcript">
+        <div class="spk-legend" id="spkLegend"></div>
+        <div class="utterances" id="utterances"></div>
+      </div>
+
+      <!-- Summary pane -->
+      <div class="rtab-pane" id="rpane-summary">
+        <div class="summary-loading-state" id="sumLoading">
+          <div class="summary-spinner"></div>
+          <div class="summary-loading-label">Generating summary&hellip;</div>
+          <div class="summary-loading-sub">Llama-3.2-3B-Instruct is analyzing the transcript</div>
+        </div>
+        <div id="sumContent" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Error overlay -->
+    <div id="errArea" style="display:none; padding:24px;"></div>
   </div>
 </div>
 
 <script>
-// ── Speaker palette ───────────────────────────────────────
+// ─── Speaker palette ──────────────────────────────────────
 const PALETTE = [
   { fg:'#2563EB', bg:'#EFF6FF', bd:'#BFDBFE' },
   { fg:'#DC2626', bg:'#FFF1F2', bd:'#FECACA' },
@@ -355,7 +616,7 @@ const PALETTE = [
   { fg:'#C2410C', bg:'#FFF7ED', bd:'#FDBA74' },
 ];
 
-// ── State ─────────────────────────────────────────────────
+// ─── State ────────────────────────────────────────────────
 let activeTab    = 'record';
 let recordedBlob = null;
 let uploadedFile = null;
@@ -366,19 +627,30 @@ let timerSecs    = 0;
 let timerID      = null;
 let elapsedID    = null;
 
-// ── Tab switching ─────────────────────────────────────────
-document.querySelectorAll('.tab').forEach(t =>
+// ─── Input tab switching ──────────────────────────────────
+document.querySelectorAll('.itab').forEach(t =>
   t.addEventListener('click', () => {
     activeTab = t.dataset.tab;
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.itab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.itab-pane').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
     document.getElementById('pane-' + activeTab).classList.add('active');
     syncBtn();
   })
 );
 
-// ── Recording ─────────────────────────────────────────────
+// ─── Result tab switching ─────────────────────────────────
+document.querySelectorAll('.rtab').forEach(t =>
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.rtab').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.rtab-pane').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('rpane-' + t.dataset.rtab).classList.add('active');
+  })
+);
+
+// ─── Recording ────────────────────────────────────────────
+const micRing      = document.getElementById('micRing');
 const micBtn       = document.getElementById('micBtn');
 const recStatus    = document.getElementById('recStatus');
 const recTimer     = document.getElementById('recTimer');
@@ -402,29 +674,26 @@ async function startRec() {
   silentGain.gain.value = 0;
 
   processor.onaudioprocess = e => {
-    if (isRecording)
-      audioChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+    if (isRecording) audioChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
   };
   src.connect(processor);
   processor.connect(silentGain);
   silentGain.connect(audioCtx.destination);
 
-  isRecording = true;
+  isRecording  = true;
   recordedBlob = null;
   audioPreview.classList.remove('visible');
 
+  micRing.classList.add('recording');
   micBtn.className   = 'mic-btn recording';
-  micBtn.textContent = '⏹';
-  recStatus.className = 'rec-status live';
-  recStatus.textContent = 'Recording…';
+  micBtn.textContent = '\u23F9';
+  recStatus.className   = 'rec-label live';
+  recStatus.textContent = 'Recording\u2026';
   recTimer.classList.add('visible');
 
   timerSecs = 0;
   recTimer.textContent = fmtTimer(0);
-  timerID = setInterval(() => {
-    timerSecs++;
-    recTimer.textContent = fmtTimer(timerSecs);
-  }, 1000);
+  timerID = setInterval(() => { timerSecs++; recTimer.textContent = fmtTimer(timerSecs); }, 1000);
 }
 
 async function stopRec() {
@@ -435,8 +704,7 @@ async function stopRec() {
   mediaStream.getTracks().forEach(t => t.stop());
   await audioCtx.close();
 
-  // Merge Float32 chunks → WAV blob
-  const total  = audioChunks.reduce((s,c) => s + c.length, 0);
+  const total  = audioChunks.reduce((s, c) => s + c.length, 0);
   const merged = new Float32Array(total);
   let off = 0;
   for (const c of audioChunks) { merged.set(c, off); off += c.length; }
@@ -445,50 +713,48 @@ async function stopRec() {
   audioPreview.src = URL.createObjectURL(recordedBlob);
   audioPreview.classList.add('visible');
 
+  micRing.classList.remove('recording');
   micBtn.className    = 'mic-btn idle';
-  micBtn.textContent  = '🎙';
-  recStatus.className = 'rec-status';
-  recStatus.textContent = `Recorded ${fmtTimer(timerSecs)} — ready`;
+  micBtn.textContent  = '\u{1F399}';
+  recStatus.className   = 'rec-label';
+  recStatus.textContent = `Recorded ${fmtTimer(timerSecs)} \u2014 ready`;
 
   syncBtn();
 }
 
 function fmtTimer(s) {
-  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
 }
 
-// ── WAV encoder (raw PCM → .wav blob) ────────────────────
+// ─── WAV encoder ──────────────────────────────────────────
 function toWavBlob(samples, sr) {
   const dLen = samples.length * 2;
   const buf  = new ArrayBuffer(44 + dLen);
   const v    = new DataView(buf);
-  const s    = (o, x) => { for (let i=0;i<x.length;i++) v.setUint8(o+i, x.charCodeAt(i)); };
+  const s    = (o, x) => { for (let i = 0; i < x.length; i++) v.setUint8(o + i, x.charCodeAt(i)); };
 
-  s(0,'RIFF'); v.setUint32(4, 36+dLen, true);
-  s(8,'WAVE'); s(12,'fmt ');
-  v.setUint32(16, 16, true);
-  v.setUint16(20,  1, true);  // PCM
-  v.setUint16(22,  1, true);  // mono
-  v.setUint32(24, sr, true);
-  v.setUint32(28, sr*2, true);
-  v.setUint16(32,  2, true);
+  s(0, 'RIFF'); v.setUint32(4, 36 + dLen, true);
+  s(8, 'WAVE'); s(12, 'fmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+  v.setUint16(22, 1, true);  v.setUint32(24, sr, true);
+  v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true);
   v.setUint16(34, 16, true);
-  s(36,'data'); v.setUint32(40, dLen, true);
+  s(36, 'data'); v.setUint32(40, dLen, true);
 
   let o = 44;
-  for (let i=0; i<samples.length; i++) {
+  for (let i = 0; i < samples.length; i++) {
     const x = Math.max(-1, Math.min(1, samples[i]));
-    v.setInt16(o, x < 0 ? x*32768 : x*32767, true);
+    v.setInt16(o, x < 0 ? x * 32768 : x * 32767, true);
     o += 2;
   }
-  return new Blob([buf], { type:'audio/wav' });
+  return new Blob([buf], { type: 'audio/wav' });
 }
 
-// ── File upload ───────────────────────────────────────────
-const dropZone  = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const fileBadge = document.getElementById('fileBadge');
-const fileNameEl= document.getElementById('fileName');
+// ─── File upload ──────────────────────────────────────────
+const dropZone   = document.getElementById('dropZone');
+const fileInput  = document.getElementById('fileInput');
+const fileBadge  = document.getElementById('fileBadge');
+const fileNameEl = document.getElementById('fileName');
 
 dropZone.addEventListener('click', () => fileInput.click());
 fileInput.addEventListener('change', e => { if (e.target.files[0]) pickFile(e.target.files[0]); });
@@ -506,131 +772,220 @@ function pickFile(f) {
   syncBtn();
 }
 
-// ── Transcribe button ─────────────────────────────────────
+// ─── Button state ─────────────────────────────────────────
 function syncBtn() {
-  const ready = (activeTab==='record' && recordedBlob) ||
-                (activeTab==='upload' && uploadedFile);
+  const ready = (activeTab === 'record' && recordedBlob) ||
+                (activeTab === 'upload' && uploadedFile);
   document.getElementById('btnGo').disabled = !ready;
 }
 
+// ─── Run pipeline ─────────────────────────────────────────
 document.getElementById('btnGo').addEventListener('click', async () => {
-  const blob = activeTab==='record' ? recordedBlob : uploadedFile;
+  const blob = activeTab === 'record' ? recordedBlob : uploadedFile;
   if (!blob) return;
 
-  const btn   = document.getElementById('btnGo');
-  const icon  = document.getElementById('btnIcon');
-  const label = document.getElementById('btnLabel');
+  const btn     = document.getElementById('btnGo');
+  const btnIcon = document.getElementById('btnIcon');
+  const btnLabel= document.getElementById('btnLabel');
+  const btnElap = document.getElementById('btnElapsed');
 
   btn.disabled = true;
-  icon.innerHTML = '<span class="spinner"></span>';
+  btnIcon.innerHTML = '<span class="spinner-white"></span>';
+  btnLabel.textContent = 'Transcribing\u2026';
+  btnElap.style.display = 'inline';
+  btnElap.textContent = '0:00';
 
-  // Show elapsed time while server processes
   let eSecs = 0;
   elapsedID = setInterval(() => {
     eSecs++;
-    label.textContent = `Processing… ${fmtTimer(eSecs)}`;
+    btnElap.textContent = fmtTimer(eSecs);
   }, 1000);
-  label.textContent = 'Processing… 0:00';
 
   const fd   = new FormData();
-  const name = activeTab==='upload' ? (uploadedFile.name||'audio.wav') : 'recording.wav';
+  const name = activeTab === 'upload' ? (uploadedFile.name || 'audio.wav') : 'recording.wav';
   fd.append('audio', blob, name);
 
+  // Reset result panels
+  showPlaceholder(false);
+  document.getElementById('errArea').style.display = 'none';
+  document.getElementById('resultsArea').style.display = 'none';
+
   try {
-    console.log('[transcribe] Sending request…');
-    const resp = await fetch('/transcribe', { method:'POST', body:fd });
-    console.log(`[transcribe] HTTP ${resp.status} ${resp.statusText}`);
-
-    const raw = await resp.text();
-    console.log('[transcribe] Raw response (first 300 chars):', raw.slice(0, 300));
-
+    const resp = await fetch('/transcribe', { method: 'POST', body: fd });
+    const raw  = await resp.text();
     let data;
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      renderErr(`Server returned non-JSON (HTTP ${resp.status}).<br><pre style="font-size:11px;overflow:auto;margin-top:8px;">${esc(raw.slice(0, 500))}</pre>`);
+    try { data = JSON.parse(raw); }
+    catch {
+      showErr(`Server returned non-JSON (HTTP ${resp.status}).<pre style="font-size:11px;margin-top:8px;overflow:auto;">${esc(raw.slice(0, 500))}</pre>`);
       return;
     }
 
-    if (data.status === 'ok') render(data.transcript);
-    else                       renderErr(data.detail || data.message || 'Unknown error');
-  } catch(e) {
-    console.error('[transcribe] Fetch failed:', e);
-    renderErr(e.message);
+    if (data.status !== 'ok') { showErr(data.detail || data.message || 'Unknown error'); return; }
+
+    renderTranscript(data.transcript);
+
+    // Kick off summarization asynchronously
+    const plainText = data.transcript.map(t => `[Speaker ${t.speaker}]: ${t.text}`).join('\n');
+    triggerSummarize(plainText);
+
+  } catch (e) {
+    showErr(e.message);
   } finally {
     clearInterval(elapsedID);
     btn.disabled = false;
-    icon.textContent = '▶';
-    label.textContent = 'Transcribe';
+    btnIcon.textContent = '\u25B6';
+    btnLabel.textContent = 'Run Pipeline';
+    btnElap.style.display = 'none';
     syncBtn();
   }
 });
 
-// ── Render transcript ─────────────────────────────────────
-function render(tr) {
-  const panel = document.getElementById('rightPanel');
+// ─── Summarize (async, non-blocking) ─────────────────────
+async function triggerSummarize(text) {
+  // Show loading badge on Summary tab
+  const badge = document.getElementById('sumBadge');
+  badge.className = 'rtab-badge loading';
+  badge.textContent = '';
 
+  document.getElementById('sumLoading').style.display = 'flex';
+  document.getElementById('sumContent').style.display = 'none';
+
+  try {
+    const resp = await fetch('/summarize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    const data = await resp.json();
+
+    badge.className = 'rtab-badge';
+
+    if (data.status === 'ok') {
+      badge.textContent = '\u2713';
+      renderSummary(data.summary);
+    } else {
+      badge.textContent = '!';
+      badge.style.background = '#FEE2E2';
+      badge.style.color = '#DC2626';
+      renderSummaryErr(data.detail || 'Summarization failed.');
+    }
+  } catch (e) {
+    badge.className = 'rtab-badge';
+    badge.textContent = '!';
+    renderSummaryErr(e.message);
+  }
+}
+
+// ─── Render transcript ────────────────────────────────────
+function renderTranscript(tr) {
   if (!tr || !tr.length) {
-    panel.innerHTML = `<div class="placeholder"><div class="ph-ico">🔇</div><p>No speech detected.</p></div>`;
+    showErr('No speech detected in the audio.');
     return;
   }
 
   const speakers = [...new Set(tr.map(t => t.speaker))].sort();
-  const cmap = {};
-  speakers.forEach((s,i) => cmap[s] = PALETTE[i % PALETTE.length]);
-
-  const total = Math.max(...tr.map(t => t.end));
+  const cmap     = {};
+  speakers.forEach((s, i) => { cmap[s] = PALETTE[i % PALETTE.length]; });
+  const total    = Math.max(...tr.map(t => t.end));
 
   // Stats
-  const stats = `
-  <div class="stats">
-    <div><div class="stat-label">Duration</div><div class="stat-val">${ft(total)}</div></div>
-    <div><div class="stat-label">Speakers</div><div class="stat-val">${speakers.length}</div></div>
-    <div><div class="stat-label">Utterances</div><div class="stat-val">${tr.length}</div></div>
-  </div>`;
+  document.getElementById('statsBar').innerHTML =
+    statItem('Duration',   ft(total)) +
+    statItem('Speakers',   speakers.length) +
+    statItem('Utterances', tr.length);
 
-  // Legend
-  const legend = `<div class="legend">` +
-    speakers.map(s => {
-      const c = cmap[s];
-      return `<div class="leg-chip" style="background:${c.bg};border:1px solid ${c.bd};">
-        <div class="leg-dot" style="background:${c.fg};"></div>
-        <span style="color:${c.fg};">Speaker ${s}</span>
-      </div>`;
-    }).join('') + `</div>`;
+  document.getElementById('uttCount').textContent = tr.length;
+
+  // Speaker legend
+  document.getElementById('spkLegend').innerHTML = speakers.map(s => {
+    const c = cmap[s];
+    return `<div class="spk-chip" style="background:${c.bg};border:1px solid ${c.bd};">
+      <div class="spk-dot" style="background:${c.fg};"></div>
+      <span style="color:${c.fg};">Speaker ${s}</span>
+    </div>`;
+  }).join('');
 
   // Utterances
-  const utts = `<div class="utterances">` +
-    tr.map(t => {
-      const c = cmap[t.speaker];
-      return `<div class="utt" style="background:${c.bg};border-left:3px solid ${c.fg};">
-        <div class="utt-meta">
-          <div class="utt-spk" style="color:${c.fg};">Spk ${t.speaker}</div>
-          <div class="utt-t">${ft(t.start)}</div>
-          <div class="utt-t">↳ ${ft(t.end)}</div>
-        </div>
-        <div class="utt-text">${esc(t.text)}</div>
-      </div>`;
-    }).join('') + `</div>`;
+  document.getElementById('utterances').innerHTML = tr.map(t => {
+    const c = cmap[t.speaker];
+    return `<div class="utt" style="background:${c.bg};border-left-color:${c.fg};">
+      <div class="utt-meta">
+        <div class="utt-spk" style="color:${c.fg};">Spk ${t.speaker}</div>
+        <div class="utt-time">${ft(t.start)}</div>
+        <div class="utt-time">\u2193 ${ft(t.end)}</div>
+      </div>
+      <div class="utt-text">${esc(t.text)}</div>
+    </div>`;
+  }).join('');
 
-  panel.innerHTML = stats + legend + utts;
-  panel.scrollTop = 0;
+  // Show results; activate Transcript tab
+  showPlaceholder(false);
+  document.getElementById('errArea').style.display = 'none';
+  document.getElementById('resultsArea').style.display = 'flex';
+
+  document.querySelectorAll('.rtab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.rtab-pane').forEach(x => x.classList.remove('active'));
+  document.querySelector('[data-rtab="transcript"]').classList.add('active');
+  document.getElementById('rpane-transcript').classList.add('active');
+
+  document.getElementById('rpane-transcript').scrollTop = 0;
 }
 
-function renderErr(msg) {
-  document.getElementById('rightPanel').innerHTML =
-    `<div class="err-card"><strong>Error:</strong> ${esc(msg)}</div>`;
+function statItem(label, val) {
+  return `<div class="stat-item">
+    <div class="stat-lbl">${label}</div>
+    <div class="stat-num">${val}</div>
+  </div>`;
+}
+
+// ─── Render summary ───────────────────────────────────────
+function renderSummary(text) {
+  const wordCount = text.trim().split(/\s+/).length;
+  document.getElementById('sumLoading').style.display = 'none';
+  document.getElementById('sumContent').style.display = 'block';
+  document.getElementById('sumContent').innerHTML = `
+    <div class="summary-card">
+      <div class="summary-card-header">
+        <div class="summary-card-title">Conversation Summary</div>
+        <div class="summary-model-tag">meta-llama/Llama-3.2-3B-Instruct</div>
+      </div>
+      <div class="summary-body">${esc(text)}</div>
+      <div class="summary-footer">
+        <span>${wordCount} words</span>
+        <span>Generated ${new Date().toLocaleTimeString()}</span>
+      </div>
+    </div>`;
+}
+
+function renderSummaryErr(msg) {
+  document.getElementById('sumLoading').style.display = 'none';
+  document.getElementById('sumContent').style.display = 'block';
+  document.getElementById('sumContent').innerHTML =
+    `<div class="err-card"><strong>Summarization error:</strong> ${esc(msg)}</div>`;
+}
+
+// ─── Helpers ──────────────────────────────────────────────
+function showPlaceholder(show) {
+  document.getElementById('placeholder').style.display = show ? 'flex' : 'none';
+}
+
+function showErr(msg) {
+  showPlaceholder(false);
+  document.getElementById('resultsArea').style.display = 'none';
+  const el = document.getElementById('errArea');
+  el.style.display = 'block';
+  el.innerHTML = `<div class="err-card"><strong>Error:</strong> ${msg}</div>`;
 }
 
 function ft(s) {
-  const m = Math.floor(s / 60);
+  const m   = Math.floor(s / 60);
   const sec = (s % 60).toFixed(1);
-  return m > 0 ? `${m}:${String(Math.floor(s%60)).padStart(2,'0')}` : `${sec}s`;
+  return m > 0 ? `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}` : `${sec}s`;
 }
 
 function esc(str) {
   return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 </script>
 </body>

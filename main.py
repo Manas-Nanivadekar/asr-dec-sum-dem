@@ -12,7 +12,7 @@ torch._C._jit_set_texpr_fuser_enabled(True)
 import soundfile as sf
 from scipy.signal import resample_poly
 from dotenv import load_dotenv
-from transformers import AutoModel
+from transformers import AutoModel, AutoTokenizer, AutoModelForCausalLM
 from diarizen.pipelines.inference import DiariZenPipeline
 
 load_dotenv()
@@ -125,6 +125,66 @@ class DiCoIndicPipeline:
 pipeline = DiCoIndicPipeline(
     asr_model, diarization_pipeline=diar_pipeline, device=device
 )
+
+# -------------------------------
+# Summarization Model (Llama-3.2-3B-Instruct)
+# -------------------------------
+
+print("Loading summarization model (meta-llama/Llama-3.2-3B-Instruct)...")
+
+_sum_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+
+sum_tokenizer = AutoTokenizer.from_pretrained(
+    "meta-llama/Llama-3.2-3B-Instruct",
+    token=HF_TOKEN,
+)
+sum_model = AutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-3.2-3B-Instruct",
+    token=HF_TOKEN,
+    torch_dtype=_sum_dtype,
+).to(device)
+sum_model.eval()
+
+print("Summarization model ready.")
+
+_SUMMARIZE_SYSTEM = (
+    "You are a research assistant specializing in speech and conversation analysis. "
+    "Summarize the provided conversation transcript clearly and concisely. "
+    "Highlight key topics discussed, the main points raised by each speaker, "
+    "and any notable conclusions or action items. "
+    "Write in formal academic prose. Do not include filler phrases."
+)
+
+_MAX_TRANSCRIPT_CHARS = 4000  # ~1 000 tokens of source text
+
+
+def summarize_transcript(transcript_text: str) -> str:
+    if len(transcript_text) > _MAX_TRANSCRIPT_CHARS:
+        transcript_text = transcript_text[:_MAX_TRANSCRIPT_CHARS] + "…"
+
+    messages = [
+        {"role": "system", "content": _SUMMARIZE_SYSTEM},
+        {"role": "user",   "content": f"Transcript:\n\n{transcript_text}\n\nSummary:"},
+    ]
+
+    input_ids = sum_tokenizer.apply_chat_template(
+        messages,
+        add_generation_prompt=True,
+        return_tensors="pt",
+    ).to(device)
+
+    with torch.no_grad():
+        output_ids = sum_model.generate(
+            input_ids,
+            max_new_tokens=400,
+            temperature=0.3,
+            do_sample=True,
+            pad_token_id=sum_tokenizer.eos_token_id,
+        )
+
+    generated = output_ids[0][input_ids.shape[1]:]
+    return sum_tokenizer.decode(generated, skip_special_tokens=True).strip()
+
 
 if __name__ == "__main__":
     audio_file = "179729.wav"
