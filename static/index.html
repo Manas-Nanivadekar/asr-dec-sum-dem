@@ -1148,8 +1148,8 @@
             vy: 0,
             freq1: 0.0011,
             freq2: 0.0016,
-            rangeX: 12,
-            rangeY: 12,
+            rangeX: 5.5,
+            rangeY: 7.5,
             phase: 0.2,
           },
           {
@@ -1164,8 +1164,8 @@
             vy: 0,
             freq1: 0.0014,
             freq2: 0.0012,
-            rangeX: 10,
-            rangeY: 11,
+            rangeX: 4.8,
+            rangeY: 6.8,
             phase: 2.2,
           },
           {
@@ -1180,8 +1180,8 @@
             vy: 0,
             freq1: 0.001,
             freq2: 0.0018,
-            rangeX: 13,
-            rangeY: 10,
+            rangeX: 5.8,
+            rangeY: 7.8,
             phase: 4.1,
           },
           {
@@ -1196,8 +1196,8 @@
             vy: 0,
             freq1: 0.0017,
             freq2: 0.0013,
-            rangeX: 11,
-            rangeY: 12,
+            rangeX: 5,
+            rangeY: 6.6,
             phase: 1.7,
           },
           {
@@ -1212,8 +1212,8 @@
             vy: 0,
             freq1: 0.00095,
             freq2: 0.00135,
-            rangeX: 13,
-            rangeY: 10,
+            rangeX: 5.7,
+            rangeY: 7.2,
             phase: 5.1,
           },
         ];
@@ -1276,16 +1276,18 @@
         function animate(currentTime) {
           const dt = Math.min((currentTime - prevTime) / 16.66, 2.5);
           prevTime = currentTime;
+          const globalWave = Math.sin(currentTime * 0.0032);
 
           nodes.forEach((node) => {
+            // Coordinated motion: top nodes drift down while bottom nodes drift up, then swap.
+            const verticalDirection = node.baseY < 90 ? 1 : -1;
             const targetX =
               node.baseX +
-              Math.sin(currentTime * node.freq1 + node.phase) * node.rangeX +
-              Math.cos(currentTime * node.freq2 * 0.72) * (node.rangeX * 0.35);
+              Math.sin(currentTime * node.freq1 + node.phase) * node.rangeX;
             const targetY =
               node.baseY +
-              Math.cos(currentTime * node.freq2 + node.phase) * node.rangeY +
-              Math.sin(currentTime * node.freq1 * 1.2) * (node.rangeY * 0.35);
+              verticalDirection * globalWave * node.rangeY +
+              Math.cos(currentTime * node.freq2 + node.phase) * (node.rangeY * 0.25);
 
             let forceX = (targetX - node.x) * 0.055;
             let forceY = (targetY - node.y) * 0.055;
@@ -1316,18 +1318,12 @@
 
             const pulse = Math.sin(currentTime * 0.003 + node.phase) * 0.45;
             const finalR = Math.max(0.1, node.r + pulse);
-            const flip = Math.sin(currentTime * 0.006 + node.phase);
-            const squashX = 0.78 + (flip + 1) * 0.2;
-            const squashY = 1.22 - (flip + 1) * 0.18;
 
             const circleEntry = circleElements.find((c) => c.node.id === node.id);
             circleEntry.circle.setAttribute("cx", node.x);
             circleEntry.circle.setAttribute("cy", node.y);
             circleEntry.circle.setAttribute("r", finalR);
-            circleEntry.circle.setAttribute(
-              "transform",
-              `translate(${node.x} ${node.y}) scale(${squashX.toFixed(3)} ${squashY.toFixed(3)}) translate(${-node.x} ${-node.y})`,
-            );
+            circleEntry.circle.removeAttribute("transform");
           });
 
           lineElements.forEach(({ line, n1, n2 }) => {
