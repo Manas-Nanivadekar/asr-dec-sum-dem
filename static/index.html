@@ -101,6 +101,7 @@
       .leap-logo-frame {
         width: 188px;
         height: 86px;
+        position: relative;
       }
       .leap-logo-img {
         width: 100%;
@@ -108,6 +109,46 @@
         display: block;
         object-fit: cover;
         object-position: center center;
+        position: relative;
+        z-index: 2;
+      }
+      .leap-dot {
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #60a5fa;
+        left: -14px;
+        top: 50%;
+        z-index: 3;
+        opacity: 0;
+        animation: leap-dot-fly 2.2s linear infinite;
+      }
+      .leap-dot.d1 {
+        animation-delay: 0s;
+      }
+      .leap-dot.d2 {
+        animation-delay: 0.6s;
+      }
+      .leap-dot.d3 {
+        animation-delay: 1.2s;
+      }
+      @keyframes leap-dot-fly {
+        0% {
+          transform: translate(-8px, -10px) scale(0.6);
+          opacity: 0;
+        }
+        15% {
+          opacity: 0.95;
+        }
+        65% {
+          transform: translate(146px, -2px) scale(1);
+          opacity: 0.95;
+        }
+        100% {
+          transform: translate(210px, 8px) scale(0.7);
+          opacity: 0;
+        }
       }
       .openday-badge {
         display: flex;
@@ -146,8 +187,18 @@
           object-fit: cover;
           object-position: center center;
         }
+        .leap-dot {
+          width: 6px;
+          height: 6px;
+        }
         .openday-badge {
           display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .leap-dot {
+          animation: none;
+          opacity: 0;
         }
       }
 
@@ -866,6 +917,9 @@
       </div>
       <div class="identity-right">
         <div class="logo-frame leap-logo-frame">
+          <span class="leap-dot d1" aria-hidden="true"></span>
+          <span class="leap-dot d2" aria-hidden="true"></span>
+          <span class="leap-dot d3" aria-hidden="true"></span>
           <img class="leap-logo-img" src="/assets/leap-1.png" alt="LEAP Lab" />
         </div>
         <div class="openday-badge">Open Day <span>2026</span></div>
