@@ -429,12 +429,6 @@
 
       <!-- Record -->
       <div class="itab-pane active" id="pane-record">
-        <div id="micWarning" style="display:none;
-          background:#FFF7ED; border:1px solid #FED7AA; border-radius:8px;
-          padding:10px 13px; margin-bottom:12px; font-size:12px; line-height:1.6; color:#92400E;">
-          <strong style="display:block;margin-bottom:2px;">Microphone unavailable</strong>
-          <span id="micWarningText"></span>
-        </div>
         <div class="record-area">
           <div class="mic-ring" id="micRing">
             <div class="mic-ring-outer"></div>
@@ -648,39 +642,10 @@ function unlockTab(name) {
   }
 }
 
-// ─── Microphone permission probe ──────────────────────────
-async function probeMic() {
-  const warn    = document.getElementById('micWarning');
-  const warnTxt = document.getElementById('micWarningText');
-
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    const isHttp = location.protocol === 'http:' && location.hostname !== 'localhost';
-    warnTxt.innerHTML = isHttp
-      ? 'Browsers block microphone access on plain HTTP. Ask your administrator to enable HTTPS, '
-        + 'or open this page via an SSH tunnel on <code>localhost</code>.'
-      : 'Your browser does not support microphone access.';
-    warn.style.display = 'block';
-    document.getElementById('micBtn').disabled = true;
-    return;
-  }
-
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    stream.getTracks().forEach(t => t.stop()); // release immediately — just wanted the prompt
-    warn.style.display = 'none';
-    document.getElementById('micBtn').disabled = false;
-  } catch (e) {
-    warn.style.display = 'block';
-    document.getElementById('micBtn').disabled = true;
-    if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
-      warnTxt.textContent = 'Permission denied. Click the lock/info icon in your browser\'s address bar and allow microphone access, then reload.';
-    } else if (e.name === 'NotFoundError') {
-      warnTxt.textContent = 'No microphone found. Please connect a microphone and try again.';
-    } else {
-      warnTxt.textContent = `Microphone error: ${e.message}`;
-    }
-  }
-}
+// ─── Request mic permission on page load ──────────────────
+navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+  .then(stream => stream.getTracks().forEach(t => t.stop()))
+  .catch(() => {}); // silently ignore — user can still grant when they click record
 
 // ─── Input tab switching ──────────────────────────────────
 document.querySelectorAll('.itab').forEach(t =>
@@ -690,13 +655,9 @@ document.querySelectorAll('.itab').forEach(t =>
     document.querySelectorAll('.itab-pane').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
     document.getElementById('pane-' + activeTab).classList.add('active');
-    if (activeTab === 'record') probeMic();
     syncBtn();
   })
 );
-
-// Probe on initial load since Record tab is active by default
-probeMic();
 
 // ─── Recording ────────────────────────────────────────────
 const micRing      = document.getElementById('micRing');
@@ -708,14 +669,10 @@ const audioPreview = document.getElementById('audioPreview');
 micBtn.addEventListener('click', () => isRecording ? stopRec() : startRec());
 
 async function startRec() {
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    await probeMic(); // will show the inline warning
-    return;
-  }
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-  } catch (e) {
-    await probeMic(); // updates the inline warning with the specific error
+  } catch {
+    alert('Microphone access was denied. Please allow microphone permissions and try again.');
     return;
   }
   audioCtx = new AudioContext(); audioChunks = [];
