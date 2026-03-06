@@ -228,6 +228,7 @@ _SUMMARY_TEMPLATE = (
     "2) Always provide SUMMARY, TOPIC, and CONCLUSION.\n"
     "3) If and only if medical, also provide DOCTOR_ADVICE and CLINICAL_INDICATORS.\n\n"
     "Rules:\n"
+    "- Write all fields in English only.\n"
     "- DOMAIN must be either MEDICAL or GENERAL.\n"
     "- If DOMAIN is GENERAL, set DOCTOR_ADVICE to NA and CLINICAL_INDICATORS to NA.\n"
     "- CLINICAL_INDICATORS should include vital signs/lab values/measurements when present (BP, sugar, SPO2, etc.), else NA.\n"
@@ -247,6 +248,10 @@ def _extract_tag(text: str, tag: str) -> str:
     if not match:
         return ""
     return " ".join(match.group(1).strip().split())
+
+
+def _contains_devanagari(text: str) -> bool:
+    return bool(re.search(r"[\u0900-\u097F]", text))
 
 
 def _strip_speaker_tags(text: str) -> str:
@@ -356,7 +361,7 @@ def _generate_medical_fields(transcript_text: str, model_device: torch.device) -
     clean_text = _strip_speaker_tags(transcript_text)
     prompt = (
         "You are extracting fields from a medical conversation transcript.\n"
-        "Write concise, non-repetitive content. Do not copy speaker labels.\n"
+        "Write concise, non-repetitive content in English only. Do not copy speaker labels.\n"
         "Return only these tags and nothing else:\n"
         "<DOCTOR_ADVICE>Concise doctor guidance, if present else NA</DOCTOR_ADVICE>\n"
         "<CLINICAL_INDICATORS>Clinical measurements/findings (BP/sugar/SPO2/etc.) else NA</CLINICAL_INDICATORS>\n\n"
@@ -387,6 +392,39 @@ def _generate_medical_fields(transcript_text: str, model_device: torch.device) -
         "DOCTOR_ADVICE": _strip_speaker_tags(_extract_tag(raw, "DOCTOR_ADVICE")) or "NA",
         "CLINICAL_INDICATORS": _strip_speaker_tags(_extract_tag(raw, "CLINICAL_INDICATORS")) or "NA",
     }
+
+
+def _to_english(text: str, model_device: torch.device) -> str:
+    if not text or text == "NA" or not _contains_devanagari(text):
+        return text
+    prompt = (
+        "Translate the following medical summary text to concise, natural English.\n"
+        "Keep clinical facts and numbers exact. Return only the translation.\n\n"
+        f"Text:\n{text}"
+    )
+    messages = [
+        {"role": "system", "content": "You are a precise translator. Output English only."},
+        {"role": "user", "content": prompt},
+    ]
+    formatted = sum_tokenizer.apply_chat_template(
+        messages,
+        add_generation_prompt=True,
+        tokenize=False,
+    )
+    ids = sum_tokenizer(formatted, return_tensors="pt").input_ids.to(model_device)
+    with torch.no_grad():
+        out = sum_model.generate(
+            ids,
+            max_new_tokens=256,
+            do_sample=False,
+            num_beams=1,
+            use_cache=True,
+            repetition_penalty=1.0,
+            pad_token_id=sum_tokenizer.eos_token_id,
+        )
+    raw = sum_tokenizer.decode(out[0][ids.shape[1] :], skip_special_tokens=True).strip()
+    cleaned = " ".join(raw.split())
+    return cleaned or text
 
 
 def _clean_structured_summary(
@@ -421,6 +459,10 @@ def _clean_structured_summary(
     else:
         sections["DOCTOR_ADVICE"] = "NA"
         sections["CLINICAL_INDICATORS"] = "NA"
+
+    # Normalize output language to English for UI consistency.
+    for key in ("SUMMARY", "TOPIC", "CONCLUSION", "DOCTOR_ADVICE", "CLINICAL_INDICATORS"):
+        sections[key] = _to_english(sections[key], model_device)
 
     tagged = "\n".join(
         f"<{tag}>{sections[tag]}</{tag}>"
