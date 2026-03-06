@@ -249,7 +249,122 @@ def _extract_tag(text: str, tag: str) -> str:
     return " ".join(match.group(1).strip().split())
 
 
-def _clean_structured_summary(raw_text: str) -> tuple[str, dict[str, str]]:
+_MEDICAL_KEYWORDS = {
+    # English
+    "doctor", "hospital", "clinic", "medicine", "medication", "tablet", "dose",
+    "diagnosis", "symptom", "treatment", "prescription", "bp", "blood pressure",
+    "sugar", "glucose", "diabetes", "fever", "pain", "headache", "menstruation",
+    "period", "pregnancy", "hemoglobin", "spo2", "pulse", "heart rate",
+    # Hindi
+    "डॉक्टर", "अस्पताल", "दवा", "इलाज", "जांच", "टैबलेट", "बुखार", "दर्द",
+    "ब्लड प्रेशर", "शुगर", "मधुमेह", "मासिक", "पीरियड", "गर्भ", "नाड़ी",
+}
+
+
+def _is_medical_transcript(text: str) -> bool:
+    low = text.lower()
+    if any(k in low for k in _MEDICAL_KEYWORDS):
+        return True
+    clinical_pattern = re.compile(
+        r"\b("
+        r"bp|blood pressure|sugar|glucose|hba1c|spo2|oxygen saturation|pulse|heart rate|"
+        r"mmhg|mg/dl|bpm|mmol/l|hemoglobin|hb"
+        r")\b",
+        flags=re.IGNORECASE,
+    )
+    return bool(clinical_pattern.search(text))
+
+
+def _trim_transcript(text: str, max_chars: int) -> str:
+    if len(text) <= max_chars:
+        return text
+    half = max_chars // 2
+    return text[:half] + "\n...\n" + text[-half:]
+
+
+def _extract_clinical_indicators(text: str) -> str:
+    # Capture common metric patterns discussed in clinical conversations.
+    patterns = [
+        r"\b(?:bp|blood pressure)\s*[:\-]?\s*\d{2,3}\s*/\s*\d{2,3}\b",
+        r"\b(?:sugar|glucose)\s*[:\-]?\s*\d{2,3}(?:\.\d+)?\s*(?:mg/dl|mmol/l)?\b",
+        r"\b(?:spo2|oxygen saturation)\s*[:\-]?\s*\d{2,3}\s*%?\b",
+        r"\b(?:pulse|heart rate)\s*[:\-]?\s*\d{2,3}\s*(?:bpm)?\b",
+        r"\b(?:hb|hemoglobin)\s*[:\-]?\s*\d{1,2}(?:\.\d+)?\b",
+    ]
+    hits = []
+    for p in patterns:
+        hits.extend(re.findall(p, text, flags=re.IGNORECASE))
+    cleaned = []
+    for h in hits:
+        v = " ".join(str(h).split())
+        if v and v not in cleaned:
+            cleaned.append(v)
+    return "; ".join(cleaned) if cleaned else "NA"
+
+
+def _extract_doctor_guidance(text: str) -> str:
+    # Pull likely advice-like sentences as fallback when model omits advice tags.
+    advice_cues = (
+        "should", "must", "take", "avoid", "consult", "rest", "follow", "drink",
+        "exercise", "test", "check", "advice", "recommend", "prescribe",
+        "करें", "ले", "खाएं", "बचें", "दिखाएं", "आराम", "जांच", "सलाह",
+    )
+    sentences = re.split(r"(?<=[.!?])\s+|\n+", text)
+    picks = []
+    for s in sentences:
+        ss = " ".join(s.split())
+        low = ss.lower()
+        if len(ss) < 12:
+            continue
+        if any(cue in low for cue in advice_cues):
+            picks.append(ss)
+        if len(picks) >= 3:
+            break
+    if not picks:
+        return "NA"
+    return " ".join(picks)
+
+
+def _generate_medical_fields(transcript_text: str, model_device: torch.device) -> dict[str, str]:
+    prompt = (
+        "You are extracting fields from a medical conversation transcript.\n"
+        "Return only these tags and nothing else:\n"
+        "<DOCTOR_ADVICE>Concise doctor guidance, if present else NA</DOCTOR_ADVICE>\n"
+        "<CLINICAL_INDICATORS>Clinical measurements/findings (BP/sugar/SPO2/etc.) else NA</CLINICAL_INDICATORS>\n\n"
+        f"Transcript:\n{transcript_text}"
+    )
+    messages = [
+        {"role": "system", "content": "Return clean tagged output only."},
+        {"role": "user", "content": prompt},
+    ]
+    formatted = sum_tokenizer.apply_chat_template(
+        messages,
+        add_generation_prompt=True,
+        tokenize=False,
+    )
+    ids = sum_tokenizer(formatted, return_tensors="pt").input_ids.to(model_device)
+    with torch.no_grad():
+        out = sum_model.generate(
+            ids,
+            max_new_tokens=192,
+            do_sample=False,
+            num_beams=1,
+            use_cache=True,
+            repetition_penalty=1.0,
+            pad_token_id=sum_tokenizer.eos_token_id,
+        )
+    raw = sum_tokenizer.decode(out[0][ids.shape[1] :], skip_special_tokens=True).strip()
+    return {
+        "DOCTOR_ADVICE": _extract_tag(raw, "DOCTOR_ADVICE") or "NA",
+        "CLINICAL_INDICATORS": _extract_tag(raw, "CLINICAL_INDICATORS") or "NA",
+    }
+
+
+def _clean_structured_summary(
+    raw_text: str,
+    transcript_text: str,
+    model_device: torch.device,
+) -> tuple[str, dict[str, str]]:
     sections = {tag: _extract_tag(raw_text, tag) for tag in _SUMMARY_TAGS}
     if not sections["SUMMARY"]:
         # Fallback: salvage model text into SUMMARY if tags are missing.
@@ -258,11 +373,22 @@ def _clean_structured_summary(raw_text: str) -> tuple[str, dict[str, str]]:
     sections["TOPIC"] = sections["TOPIC"] or "NA"
     sections["CONCLUSION"] = sections["CONCLUSION"] or "NA"
     domain = (sections["DOMAIN"] or "").strip().upper()
-    sections["DOMAIN"] = "MEDICAL" if domain == "MEDICAL" else "GENERAL"
+    is_medical = domain == "MEDICAL" or _is_medical_transcript(transcript_text)
+    sections["DOMAIN"] = "MEDICAL" if is_medical else "GENERAL"
 
     if sections["DOMAIN"] == "MEDICAL":
         sections["DOCTOR_ADVICE"] = sections["DOCTOR_ADVICE"] or "NA"
         sections["CLINICAL_INDICATORS"] = sections["CLINICAL_INDICATORS"] or "NA"
+        if sections["DOCTOR_ADVICE"] == "NA" or sections["CLINICAL_INDICATORS"] == "NA":
+            gen = _generate_medical_fields(transcript_text, model_device)
+            if sections["DOCTOR_ADVICE"] == "NA":
+                sections["DOCTOR_ADVICE"] = gen["DOCTOR_ADVICE"]
+            if sections["CLINICAL_INDICATORS"] == "NA":
+                sections["CLINICAL_INDICATORS"] = gen["CLINICAL_INDICATORS"]
+        if sections["DOCTOR_ADVICE"] == "NA":
+            sections["DOCTOR_ADVICE"] = _extract_doctor_guidance(transcript_text)
+        if sections["CLINICAL_INDICATORS"] == "NA":
+            sections["CLINICAL_INDICATORS"] = _extract_clinical_indicators(transcript_text)
     else:
         sections["DOCTOR_ADVICE"] = "NA"
         sections["CLINICAL_INDICATORS"] = "NA"
@@ -275,8 +401,7 @@ def _clean_structured_summary(raw_text: str) -> tuple[str, dict[str, str]]:
 
 
 def summarize_transcript(transcript_text: str) -> tuple[str, dict[str, str]]:
-    if len(transcript_text) > _MAX_TRANSCRIPT_CHARS:
-        transcript_text = transcript_text[:_MAX_TRANSCRIPT_CHARS] + "…"
+    transcript_text = _trim_transcript(transcript_text, _MAX_TRANSCRIPT_CHARS)
 
     messages = [
         {"role": "system", "content": _SUMMARIZE_SYSTEM},
@@ -305,7 +430,7 @@ def summarize_transcript(transcript_text: str) -> tuple[str, dict[str, str]]:
 
     generated = output_ids[0][input_ids.shape[1] :]
     raw = sum_tokenizer.decode(generated, skip_special_tokens=True).strip()
-    return _clean_structured_summary(raw)
+    return _clean_structured_summary(raw, transcript_text, model_device)
 
 
 if __name__ == "__main__":
