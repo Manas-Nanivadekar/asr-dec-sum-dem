@@ -99,8 +99,8 @@
         gap: 20px;
       }
       .leap-logo-frame {
-        width: 188px;
-        height: 86px;
+        width: 228px;
+        height: 96px;
         position: relative;
       }
       .leap-logo-svg {
@@ -150,8 +150,8 @@
           height: 68px;
         }
         .leap-logo-frame {
-          width: 142px;
-          height: 68px;
+          width: 172px;
+          height: 76px;
         }
         .iisc-logo-img {
           object-fit: contain;
@@ -881,7 +881,7 @@
           <svg
             id="leapLogoSvg"
             class="leap-logo-svg"
-            viewBox="0 0 340 180"
+            viewBox="40 35 260 120"
             xmlns="http://www.w3.org/2000/svg"
             role="img"
             aria-label="LEAP Lab"
@@ -1133,6 +1133,7 @@
         const linesGroup = document.getElementById("leapLinesGroup");
         const nodesGroup = document.getElementById("leapNodesGroup");
         if (!svg || !linesGroup || !nodesGroup) return;
+        const VB = { minX: 40, minY: 35, w: 260, h: 120 };
 
         const nodes = [
           {
@@ -1245,8 +1246,8 @@
         let isHovered = false;
         svg.addEventListener("mousemove", (e) => {
           const rect = svg.getBoundingClientRect();
-          mouseX = ((e.clientX - rect.left) / rect.width) * 340;
-          mouseY = ((e.clientY - rect.top) / rect.height) * 180;
+          mouseX = VB.minX + ((e.clientX - rect.left) / rect.width) * VB.w;
+          mouseY = VB.minY + ((e.clientY - rect.top) / rect.height) * VB.h;
           isHovered = true;
         });
         svg.addEventListener("mouseleave", () => {
@@ -1315,11 +1316,18 @@
 
             const pulse = Math.sin(currentTime * 0.003 + node.phase) * 0.45;
             const finalR = Math.max(0.1, node.r + pulse);
+            const flip = Math.sin(currentTime * 0.006 + node.phase);
+            const squashX = 0.78 + (flip + 1) * 0.2;
+            const squashY = 1.22 - (flip + 1) * 0.18;
 
             const circleEntry = circleElements.find((c) => c.node.id === node.id);
             circleEntry.circle.setAttribute("cx", node.x);
             circleEntry.circle.setAttribute("cy", node.y);
             circleEntry.circle.setAttribute("r", finalR);
+            circleEntry.circle.setAttribute(
+              "transform",
+              `translate(${node.x} ${node.y}) scale(${squashX.toFixed(3)} ${squashY.toFixed(3)}) translate(${-node.x} ${-node.y})`,
+            );
           });
 
           lineElements.forEach(({ line, n1, n2 }) => {
