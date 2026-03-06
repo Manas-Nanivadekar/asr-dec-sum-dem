@@ -4,12 +4,16 @@ import tempfile
 from pathlib import Path
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 from main import pipeline
 
 app = FastAPI()
+
+
+@app.get("/")
+async def index():
+    return FileResponse("static/index.html")
 
 
 def ensure_wav(src: str) -> tuple[str, bool]:
@@ -62,7 +66,6 @@ async def transcribe(audio: UploadFile = File(...)):
                 pass
 
 
-app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 if __name__ == "__main__":
     import uvicorn
