@@ -12,10 +12,17 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from pydantic import BaseModel
 
 # ── Logging setup ─────────────────────────────────────────
+LOG_DIR = Path("./outputs/logs")
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s  %(levelname)-8s  %(message)s",
-    datefmt="%H:%M:%S",
+    format="[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(LOG_DIR / "server.log", encoding="utf-8"),
+    ],
 )
 log = logging.getLogger("server")
 
@@ -149,9 +156,9 @@ async def summarize(req: SummarizeRequest):
 
     log.info(f"Summarization request: {len(req.text)} chars")
     try:
-        summary = summarize_transcript(req.text)
+        summary, sections = summarize_transcript(req.text)
         log.info(f"Summarization done in {time.time()-t0:.1f}s  ({len(summary)} chars)")
-        return JSONResponse({"status": "ok", "summary": summary})
+        return JSONResponse({"status": "ok", "summary": summary, "summary_sections": sections})
     except Exception as e:
         log.exception("Summarization failed")
         return JSONResponse({"status": "error", "detail": str(e)}, status_code=500)

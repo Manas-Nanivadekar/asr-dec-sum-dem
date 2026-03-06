@@ -1709,7 +1709,7 @@
           sb.className = "gtab-badge";
           if (data.status === "ok") {
             sb.textContent = "\u2713";
-            renderSummary(data.summary);
+            renderSummary(data.summary, data.summary_sections || null);
           } else {
             sb.textContent = "!";
             sb.style.background = "#FEE2E2";
@@ -1723,14 +1723,34 @@
         }
       }
 
-      function renderSummary(text) {
-        const wc = text.trim().split(/\s+/).length;
+      function parseTaggedSummary(text) {
+        const pick = (tag) => {
+          const m = text.match(
+            new RegExp(`<${tag}>\\s*([\\s\\S]*?)\\s*<\\/${tag}>`, "i"),
+          );
+          return m ? m[1].trim() : "";
+        };
+        return {
+          SUMMARY: pick("SUMMARY"),
+          TOPIC: pick("TOPIC"),
+          CONCLUSION: pick("CONCLUSION"),
+        };
+      }
+
+      function renderSummary(text, sections) {
+        const parsed = sections || parseTaggedSummary(text || "");
+        const summaryText = parsed.SUMMARY || "NA";
+        const topicText = parsed.TOPIC || "NA";
+        const conclusionText = parsed.CONCLUSION || "NA";
+        const wc = summaryText.trim().split(/\s+/).filter(Boolean).length;
         document.getElementById("sumLoading").style.display = "none";
         document.getElementById("sumContent").style.display = "block";
         document.getElementById("sumContent").innerHTML = `
     <div class="sum-card">
       <div class="sum-card-hdr"><div class="sum-card-title">Conversation Summary</div></div>
-      <div class="sum-body">${esc(text)}</div>
+      <div class="sum-body"><strong>&lt;SUMMARY&gt;</strong><br>${esc(summaryText)}</div>
+      <div class="sum-body" style="margin-top:12px;"><strong>&lt;TOPIC&gt;</strong><br>${esc(topicText)}</div>
+      <div class="sum-body" style="margin-top:12px;"><strong>&lt;CONCLUSION&gt;</strong><br>${esc(conclusionText)}</div>
       <div class="sum-footer"><span>${wc} words</span><span>Generated ${new Date().toLocaleTimeString()}</span></div>
     </div>`;
       }
