@@ -117,6 +117,23 @@ async def transcribe(audio: UploadFile = File(...)):
                 pass
 
 
+# ── Script endpoint ───────────────────────────────────────
+@app.get("/script")
+async def get_script():
+    path = Path("sample_text.txt")
+    if not path.exists():
+        return JSONResponse({"status": "error", "detail": "Script file not found."}, status_code=404)
+    lines = []
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        raw = raw.strip()
+        if not raw:
+            continue
+        parts = raw.split("\t", 1)
+        if len(parts) == 2:
+            lines.append({"speaker": parts[0].strip(), "text": parts[1].strip()})
+    return JSONResponse({"status": "ok", "lines": lines})
+
+
 # ── Summarize endpoint ────────────────────────────────────
 class SummarizeRequest(BaseModel):
     text: str

@@ -6,7 +6,7 @@
   <title>IndicSpeech Lab — ASR + Diarization + Summarization</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
     rel="stylesheet"
   />
   <style>
@@ -34,11 +34,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
     }
-    .header-left {
-      display: flex; align-items: center; gap: 16px;
-    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
     .header-logo {
       width: 32px; height: 32px;
       background: linear-gradient(135deg, #6366F1, #8B5CF6);
@@ -46,38 +44,22 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 16px; flex-shrink: 0;
     }
-    .header-title {
-      font-size: 15px; font-weight: 700;
-      letter-spacing: -0.2px;
-    }
-    .header-sub {
-      font-size: 11px; color: rgba(255,255,255,0.45);
-      margin-top: 1px; font-weight: 400;
-    }
-    .header-divider {
-      width: 1px; height: 28px;
-      background: rgba(255,255,255,0.12);
-    }
+    .header-title { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+    .header-sub   { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 1px; }
+    .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,.1); }
     .header-badge {
       display: flex; align-items: center; gap: 6px;
-      background: rgba(99,102,241,0.2);
-      border: 1px solid rgba(99,102,241,0.35);
-      border-radius: 20px;
-      padding: 3px 10px 3px 6px;
+      background: rgba(99,102,241,.2); border: 1px solid rgba(99,102,241,.35);
+      border-radius: 20px; padding: 3px 10px 3px 6px;
       font-size: 11px; font-weight: 600; color: #A5B4FC;
     }
     .badge-dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: #6EE7B7;
-      box-shadow: 0 0 0 2px rgba(110,231,183,0.3);
-    }
-    .header-right {
-      display: flex; align-items: center; gap: 10px;
+      width: 6px; height: 6px; border-radius: 50%; background: #6EE7B7;
+      box-shadow: 0 0 0 2px rgba(110,231,183,.3);
     }
     .header-model-tag {
-      font-size: 11px; color: rgba(255,255,255,0.35);
+      font-size: 11px; color: rgba(255,255,255,.3);
       font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 0;
     }
 
     /* ── Layout ─────────────────────────────────────────── */
@@ -92,35 +74,26 @@
     .left {
       background: #fff;
       border-right: 1px solid #E2E8F0;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       overflow-y: auto;
     }
-
     .panel-section {
-      padding: 20px 20px;
+      padding: 18px 20px;
       border-bottom: 1px solid #F1F5F9;
     }
     .panel-section:last-child { border-bottom: none; }
-
     .section-heading {
       font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.1em;
-      color: #94A3B8; margin-bottom: 14px;
-      display: flex; align-items: center; gap: 6px;
+      text-transform: uppercase; letter-spacing: .1em; color: #94A3B8;
+      margin-bottom: 13px;
+      display: flex; align-items: center; gap: 7px;
     }
-    .section-heading::after {
-      content: ''; flex: 1; height: 1px; background: #F1F5F9;
-    }
+    .section-heading::after { content:''; flex:1; height:1px; background:#F1F5F9; }
 
     /* ── Input Tabs ─────────────────────────────────────── */
     .input-tabs {
-      display: flex;
-      background: #F1F5F9;
-      border-radius: 8px;
-      padding: 3px;
-      margin-bottom: 18px;
-      gap: 2px;
+      display: flex; background: #F1F5F9;
+      border-radius: 8px; padding: 3px; margin-bottom: 16px; gap: 2px;
     }
     .itab {
       flex: 1; padding: 7px 10px;
@@ -139,18 +112,15 @@
     /* ── Record ─────────────────────────────────────────── */
     .record-area {
       display: flex; flex-direction: column;
-      align-items: center; gap: 12px; padding: 4px 0 8px;
+      align-items: center; gap: 10px; padding: 4px 0 8px;
     }
     .mic-ring {
-      position: relative;
-      width: 80px; height: 80px;
+      position: relative; width: 76px; height: 76px;
       display: flex; align-items: center; justify-content: center;
     }
     .mic-ring-outer {
-      position: absolute; inset: 0;
-      border-radius: 50%;
-      border: 2px solid #E2E8F0;
-      transition: border-color .2s;
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 2px solid #E2E8F0; transition: border-color .2s;
     }
     .mic-ring.recording .mic-ring-outer {
       border-color: rgba(239,68,68,.4);
@@ -158,294 +128,259 @@
     }
     @keyframes ring-pulse {
       0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.12); opacity: 0.5; }
+      50%       { transform: scale(1.12); opacity: .5; }
     }
     .mic-btn {
-      width: 64px; height: 64px; border-radius: 50%;
+      width: 62px; height: 62px; border-radius: 50%;
       border: none; cursor: pointer; outline: none; z-index: 1;
       display: flex; align-items: center; justify-content: center;
       font-size: 22px; transition: transform .15s, box-shadow .15s;
     }
     .mic-btn.idle {
       background: linear-gradient(135deg, #4F46E5, #7C3AED);
-      box-shadow: 0 4px 16px rgba(79,70,229,.4);
+      box-shadow: 0 4px 14px rgba(79,70,229,.4);
     }
-    .mic-btn.idle:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 22px rgba(79,70,229,.5);
-    }
+    .mic-btn.idle:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(79,70,229,.5); }
     .mic-btn.recording {
       background: linear-gradient(135deg, #EF4444, #DC2626);
-      box-shadow: 0 4px 16px rgba(239,68,68,.4);
+      box-shadow: 0 4px 14px rgba(239,68,68,.4);
     }
-    .rec-label {
-      font-size: 12px; font-weight: 600; color: #64748B;
-    }
+    .rec-label { font-size: 12px; font-weight: 600; color: #64748B; }
     .rec-label.live { color: #EF4444; }
     .rec-timer {
-      font-size: 28px; font-weight: 800;
+      font-size: 26px; font-weight: 800;
       font-family: 'JetBrains Mono', monospace;
-      letter-spacing: -1px; color: #0F172A;
-      visibility: hidden;
+      letter-spacing: -1px; color: #0F172A; visibility: hidden;
     }
     .rec-timer.visible { visibility: visible; }
-    .audio-preview {
-      width: 100%; height: 32px; border-radius: 6px;
-      display: none; margin-top: 2px;
-    }
+    .audio-preview { width: 100%; height: 32px; border-radius: 6px; display: none; margin-top: 2px; }
     .audio-preview.visible { display: block; }
 
     /* ── Upload ─────────────────────────────────────────── */
     .drop-zone {
       border: 1.5px dashed #CBD5E1; border-radius: 10px;
-      padding: 24px 16px; text-align: center;
-      cursor: pointer; transition: all .2s;
-      background: #FAFAFA;
+      padding: 22px 14px; text-align: center;
+      cursor: pointer; transition: all .2s; background: #FAFAFA;
     }
-    .drop-zone:hover, .drop-zone.over {
-      border-color: #6366F1; background: #EEF2FF;
-    }
-    .dz-icon { font-size: 26px; margin-bottom: 8px; opacity: .7; }
+    .drop-zone:hover, .drop-zone.over { border-color: #6366F1; background: #EEF2FF; }
+    .dz-icon { font-size: 24px; margin-bottom: 7px; opacity: .7; }
     .dz-label { font-size: 13px; color: #475569; font-weight: 500; }
-    .dz-hint { font-size: 11px; color: #94A3B8; margin-top: 3px; }
+    .dz-hint  { font-size: 11px; color: #94A3B8; margin-top: 3px; }
     .file-badge {
       display: none; align-items: center; gap: 8px;
       background: #F0FDF4; border: 1px solid #86EFAC;
-      border-radius: 8px; padding: 9px 14px;
+      border-radius: 8px; padding: 8px 14px;
       margin-top: 10px; font-size: 12px; color: #15803D; font-weight: 500;
     }
     .file-badge.visible { display: flex; }
-    .file-badge .fname {
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
-    }
+    .file-badge .fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
 
-    /* ── Pipeline config ─────────────────────────────────── */
-    .model-list { display: flex; flex-direction: column; gap: 8px; }
+    /* ── Pipeline model list ─────────────────────────────── */
+    .model-list { display: flex; flex-direction: column; gap: 7px; }
     .model-row {
       display: flex; align-items: center; gap: 10px;
       padding: 8px 12px; border-radius: 8px;
       border: 1px solid #F1F5F9; background: #FAFAFA;
     }
-    .model-dot {
-      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
-    }
+    .model-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .model-name {
       font-size: 11px; font-weight: 600; color: #334155;
-      font-family: 'JetBrains Mono', monospace;
-      flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-family: 'JetBrains Mono', monospace; flex: 1;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .model-role {
-      font-size: 10px; font-weight: 600;
+      font-size: 10px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .06em; color: #94A3B8;
     }
 
-    /* ── Transcribe button ──────────────────────────────── */
-    .btn-transcribe {
+    /* ── Run button ──────────────────────────────────────── */
+    .btn-run {
       width: 100%; padding: 12px;
       background: linear-gradient(135deg, #4F46E5, #7C3AED);
-      color: white;
-      border: none; border-radius: 9px;
+      color: white; border: none; border-radius: 9px;
       font-size: 14px; font-weight: 700; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 8px;
       transition: opacity .15s, transform .15s, box-shadow .15s;
-      box-shadow: 0 2px 10px rgba(79,70,229,.35);
-      letter-spacing: -0.1px;
+      box-shadow: 0 2px 10px rgba(79,70,229,.35); letter-spacing: -0.1px;
     }
-    .btn-transcribe:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 18px rgba(79,70,229,.45);
+    .btn-run:hover:not(:disabled) {
+      transform: translateY(-1px); box-shadow: 0 4px 18px rgba(79,70,229,.45);
     }
-    .btn-transcribe:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-
+    .btn-run:disabled { opacity: .4; cursor: not-allowed; transform: none; }
     .spinner-white {
       display: inline-block; width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,.3);
-      border-top-color: white; border-radius: 50%;
-      animation: spin .6s linear infinite; flex-shrink: 0;
+      border: 2px solid rgba(255,255,255,.3); border-top-color: white;
+      border-radius: 50%; animation: spin .6s linear infinite; flex-shrink: 0;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .elapsed-label {
-      font-size: 11px; color: rgba(255,255,255,.65);
+    .elapsed-lbl {
+      font-size: 11px; color: rgba(255,255,255,.6);
       font-family: 'JetBrains Mono', monospace;
     }
 
     /* ── Right Panel ────────────────────────────────────── */
     .right {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: #F8FAFC;
+      display: flex; flex-direction: column; overflow: hidden; background: #F8FAFC;
     }
 
-    /* placeholder */
-    .placeholder {
-      flex: 1; display: flex;
-      flex-direction: column; align-items: center; justify-content: center;
-      gap: 14px; color: #94A3B8; text-align: center; padding: 40px;
-    }
-    .ph-graphic {
-      width: 72px; height: 72px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #EEF2FF, #F5F3FF);
-      border: 1.5px solid #DDD6FE;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 32px; opacity: .6;
-    }
-    .ph-title { font-size: 16px; font-weight: 700; color: #475569; }
-    .ph-sub { font-size: 13px; line-height: 1.6; color: #94A3B8; max-width: 260px; }
-
-    /* ── Results area ───────────────────────────────────── */
-    .results-area {
-      flex: 1; display: flex; flex-direction: column; overflow: hidden;
-    }
-
-    /* stats bar */
-    .stats-bar {
+    /* ── Global tab bar (always visible) ────────────────── */
+    .global-tabs {
       flex-shrink: 0;
-      display: flex; gap: 0;
-      background: #fff;
+      display: flex; background: #fff;
       border-bottom: 1px solid #E2E8F0;
-      padding: 0 28px;
+      padding: 0 28px; gap: 0;
     }
-    .stat-item {
-      padding: 14px 24px 14px 0;
-      margin-right: 24px;
-      border-right: 1px solid #F1F5F9;
+    .gtab {
+      padding: 12px 18px; font-size: 13px; font-weight: 600; color: #64748B;
+      border: none; background: transparent; cursor: pointer;
+      border-bottom: 2px solid transparent; transition: color .15s;
+      display: flex; align-items: center; gap: 6px;
     }
-    .stat-item:last-child { border-right: none; }
-    .stat-lbl {
-      font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .08em; color: #94A3B8;
-    }
-    .stat-num {
-      font-size: 22px; font-weight: 800;
-      color: #0F172A; letter-spacing: -0.5px;
-      font-variant-numeric: tabular-nums;
-      margin-top: 1px;
-    }
-
-    /* result tabs */
-    .result-tabs {
-      flex-shrink: 0;
-      display: flex;
-      background: #fff;
-      border-bottom: 1px solid #E2E8F0;
-      padding: 0 28px;
-      gap: 0;
-    }
-    .rtab {
-      padding: 11px 18px; font-size: 13px; font-weight: 600;
-      color: #64748B; border: none; background: transparent;
-      cursor: pointer; position: relative;
-      border-bottom: 2px solid transparent;
-      transition: color .15s;
-    }
-    .rtab:hover { color: #4F46E5; }
-    .rtab.active {
-      color: #4F46E5;
-      border-bottom-color: #4F46E5;
-    }
-    .rtab-badge {
+    .gtab:hover  { color: #4F46E5; }
+    .gtab.active { color: #4F46E5; border-bottom-color: #4F46E5; }
+    .gtab.locked { opacity: .4; cursor: default; }
+    .gtab-badge {
       display: inline-flex; align-items: center; justify-content: center;
-      margin-left: 6px; width: 18px; height: 18px;
-      border-radius: 50%; font-size: 10px; font-weight: 700;
+      width: 18px; height: 18px; border-radius: 50%;
+      font-size: 10px; font-weight: 700;
       background: #EEF2FF; color: #4F46E5;
     }
-    .rtab-badge.loading {
-      background: transparent;
-      border: 1.5px solid #CBD5E1;
-      border-top-color: #4F46E5;
-      animation: spin .6s linear infinite;
+    .gtab-badge.spin {
+      background: transparent; border: 1.5px solid #CBD5E1;
+      border-top-color: #4F46E5; animation: spin .6s linear infinite;
     }
 
-    /* panes */
-    .rtab-pane { display: none; flex: 1; overflow-y: auto; padding: 22px 28px; }
-    .rtab-pane.active { display: block; }
-
-    /* ── Speaker legend ──────────────────────────────────── */
-    .spk-legend {
-      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+    /* ── Stats bar ───────────────────────────────────────── */
+    .stats-bar {
+      flex-shrink: 0; display: flex; gap: 0;
+      background: #fff; border-bottom: 1px solid #E2E8F0; padding: 0 28px;
     }
+    .stat-item { padding: 12px 24px 12px 0; margin-right: 24px; border-right: 1px solid #F1F5F9; }
+    .stat-item:last-child { border-right: none; }
+    .stat-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #94A3B8; }
+    .stat-num { font-size: 20px; font-weight: 800; color: #0F172A; letter-spacing: -0.5px; margin-top: 1px; font-variant-numeric: tabular-nums; }
+
+    /* ── Pane container ──────────────────────────────────── */
+    .pane-wrap { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .gpane { display: none; flex: 1; overflow-y: auto; }
+    .gpane.active { display: block; }
+
+    /* ── Script pane ─────────────────────────────────────── */
+    .script-header {
+      padding: 18px 28px 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .script-meta { font-size: 12px; color: #94A3B8; }
+    .script-role-legend {
+      display: flex; gap: 14px; padding: 14px 28px;
+    }
+    .role-chip {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 12px; font-weight: 600; color: #475569;
+    }
+    .role-swatch {
+      width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
+    }
+    .script-lines { padding: 0 28px 28px; display: flex; flex-direction: column; gap: 10px; }
+    .script-turn { display: flex; gap: 0; align-items: flex-end; }
+
+    /* health worker — left */
+    .script-turn.spk0 { justify-content: flex-start; }
+    .script-turn.spk0 .bubble {
+      background: #EEF2FF; border: 1px solid #C7D2FE;
+      border-radius: 16px 16px 16px 4px;
+      max-width: 76%; padding: 10px 14px;
+    }
+    .script-turn.spk0 .bubble-spk { color: #4F46E5; }
+
+    /* patient — right */
+    .script-turn.spk1 { justify-content: flex-end; }
+    .script-turn.spk1 .bubble {
+      background: #F1F5F9; border: 1px solid #E2E8F0;
+      border-radius: 16px 16px 4px 16px;
+      max-width: 76%; padding: 10px 14px;
+    }
+    .script-turn.spk1 .bubble-spk { color: #64748B; }
+
+    .bubble-spk {
+      font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px;
+    }
+    .bubble-text {
+      font-size: 16px; line-height: 1.7; color: #0F172A;
+      font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'Inter', sans-serif;
+    }
+    .line-num {
+      font-size: 10px; color: #CBD5E1;
+      font-family: 'JetBrains Mono', monospace;
+      margin: 0 8px 4px; flex-shrink: 0; align-self: flex-end;
+    }
+
+    /* ── Transcript pane ─────────────────────────────────── */
+    .trans-wrap { padding: 20px 28px; }
+    .spk-legend { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
     .spk-chip {
       display: flex; align-items: center; gap: 5px;
       padding: 4px 10px 4px 7px; border-radius: 20px;
       font-size: 11px; font-weight: 700;
     }
     .spk-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-
-    /* ── Utterances ──────────────────────────────────────── */
     .utterances { display: flex; flex-direction: column; gap: 3px; }
     .utt {
       display: flex; align-items: flex-start; gap: 14px;
       padding: 10px 14px; border-radius: 8px;
-      border-left: 3px solid transparent;
-      transition: filter .1s;
+      border-left: 3px solid transparent; transition: filter .1s;
     }
     .utt:hover { filter: brightness(.97); }
-    .utt-meta { min-width: 58px; flex-shrink: 0; }
+    .utt-meta { min-width: 56px; flex-shrink: 0; }
     .utt-spk { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
     .utt-time {
       font-size: 9.5px; color: #94A3B8; margin-top: 3px;
-      font-family: 'JetBrains Mono', monospace;
-      font-variant-numeric: tabular-nums;
+      font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums;
     }
     .utt-text {
       font-size: 15px; line-height: 1.75; color: #1E293B; flex: 1;
       font-family: 'Noto Sans Devanagari', 'Mangal', 'Arial Unicode MS', 'Inter', sans-serif;
     }
 
-    /* ── Summary panel ──────────────────────────────────── */
-    .summary-loading-state {
+    /* placeholder inside pane */
+    .pane-placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100%; gap: 12px; color: #94A3B8; text-align: center; padding: 40px;
+    }
+    .pane-placeholder .ph-ico { font-size: 38px; opacity: .3; }
+    .pane-placeholder p { font-size: 13px; line-height: 1.6; }
+
+    /* ── Summary pane ────────────────────────────────────── */
+    .sum-wrap { padding: 20px 28px; }
+    .sum-loading {
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 14px; padding: 60px 20px;
-      color: #94A3B8;
+      gap: 12px; padding: 60px 20px; color: #94A3B8;
     }
-    .summary-spinner {
-      width: 36px; height: 36px;
-      border: 3px solid #E2E8F0;
-      border-top-color: #6366F1;
-      border-radius: 50%;
-      animation: spin .8s linear infinite;
+    .sum-spinner {
+      width: 32px; height: 32px; border: 3px solid #E2E8F0;
+      border-top-color: #6366F1; border-radius: 50%; animation: spin .8s linear infinite;
     }
-    .summary-loading-label { font-size: 14px; font-weight: 600; color: #475569; }
-    .summary-loading-sub { font-size: 12px; color: #94A3B8; }
-
-    .summary-card {
-      background: #fff;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    .sum-loading-lbl { font-size: 13px; font-weight: 600; color: #475569; }
+    .sum-loading-sub { font-size: 12px; }
+    .sum-card {
+      background: #fff; border: 1px solid #E2E8F0; border-radius: 12px;
+      overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.04);
     }
-    .summary-card-header {
+    .sum-card-hdr {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 1px solid #F1F5F9;
-      background: #FAFAFA;
+      padding: 13px 20px; border-bottom: 1px solid #F1F5F9; background: #FAFAFA;
     }
-    .summary-card-title {
-      font-size: 12px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: .08em; color: #475569;
+    .sum-card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #475569; }
+    .sum-model-tag {
+      font-size: 10px; font-weight: 600; font-family: 'JetBrains Mono', monospace;
+      color: #94A3B8; background: #F1F5F9; padding: 3px 8px; border-radius: 4px;
     }
-    .summary-model-tag {
-      font-size: 10px; font-weight: 600;
-      font-family: 'JetBrains Mono', monospace;
-      color: #94A3B8;
-      background: #F1F5F9;
-      padding: 3px 8px; border-radius: 4px;
-    }
-    .summary-body {
-      padding: 20px;
-      font-size: 15px; line-height: 1.8;
-      color: #1E293B;
-      white-space: pre-wrap;
-    }
-    .summary-footer {
-      padding: 10px 20px;
-      border-top: 1px solid #F1F5F9;
-      font-size: 11px; color: #94A3B8;
-      display: flex; gap: 12px;
+    .sum-body { padding: 20px; font-size: 15px; line-height: 1.85; color: #1E293B; white-space: pre-wrap; }
+    .sum-footer {
+      padding: 10px 20px; border-top: 1px solid #F1F5F9;
+      font-size: 11px; color: #94A3B8; display: flex; gap: 14px;
     }
 
     /* ── Error card ──────────────────────────────────────── */
@@ -454,7 +389,6 @@
       border-radius: 10px; padding: 16px 20px;
       color: #DC2626; font-size: 13px; line-height: 1.6;
     }
-    .err-card strong { font-weight: 700; }
 
     /* ── Scrollbar ──────────────────────────────────────── */
     ::-webkit-scrollbar { width: 5px; }
@@ -474,12 +408,9 @@
       <div class="header-sub">ASR &middot; Speaker Diarization &middot; Summarization</div>
     </div>
     <div class="header-divider"></div>
-    <div class="header-badge">
-      <div class="badge-dot"></div>
-      Models loaded
-    </div>
+    <div class="header-badge"><div class="badge-dot"></div>Models loaded</div>
   </div>
-  <div class="header-right">
+  <div>
     <span class="header-model-tag">ai4bharat/indic-conformer-600m &nbsp;&bull;&nbsp; Llama-3.2-3B-Instruct</span>
   </div>
 </header>
@@ -487,18 +418,23 @@
 <!-- ─── Layout ───────────────────────────────────────────── -->
 <div class="layout">
 
-  <!-- Left: controls -->
+  <!-- Left panel -->
   <div class="left">
     <div class="panel-section">
       <div class="section-heading">Audio Input</div>
-
       <div class="input-tabs">
         <button class="itab active" data-tab="record">&#127897; Record</button>
         <button class="itab"        data-tab="upload">&#128193; Upload</button>
       </div>
 
-      <!-- Record pane -->
+      <!-- Record -->
       <div class="itab-pane active" id="pane-record">
+        <div id="micWarning" style="display:none;
+          background:#FFF7ED; border:1px solid #FED7AA; border-radius:8px;
+          padding:10px 13px; margin-bottom:12px; font-size:12px; line-height:1.6; color:#92400E;">
+          <strong style="display:block;margin-bottom:2px;">Microphone unavailable</strong>
+          <span id="micWarningText"></span>
+        </div>
         <div class="record-area">
           <div class="mic-ring" id="micRing">
             <div class="mic-ring-outer"></div>
@@ -510,12 +446,12 @@
         <audio class="audio-preview" id="audioPreview" controls></audio>
       </div>
 
-      <!-- Upload pane -->
+      <!-- Upload -->
       <div class="itab-pane" id="pane-upload">
         <div class="drop-zone" id="dropZone">
           <div class="dz-icon">&#127925;</div>
           <div class="dz-label">Drop audio file here</div>
-          <div class="dz-hint">or click to browse &nbsp;&middot;&nbsp; WAV &middot; MP3 &middot; M4A &middot; OGG</div>
+          <div class="dz-hint">or click to browse &middot; WAV &middot; MP3 &middot; M4A &middot; OGG</div>
           <input type="file" id="fileInput" accept="audio/*" style="display:none" />
         </div>
         <div class="file-badge" id="fileBadge">
@@ -525,7 +461,6 @@
       </div>
     </div>
 
-    <!-- Pipeline models -->
     <div class="panel-section">
       <div class="section-heading">Pipeline</div>
       <div class="model-list">
@@ -547,64 +482,98 @@
       </div>
     </div>
 
-    <!-- Run button -->
     <div class="panel-section" style="margin-top:auto;">
-      <button class="btn-transcribe" id="btnGo" disabled>
+      <button class="btn-run" id="btnGo" disabled>
         <span id="btnIcon">&#9654;</span>
         <span id="btnLabel">Run Pipeline</span>
-        <span id="btnElapsed" class="elapsed-label" style="display:none;"></span>
+        <span id="btnElapsed" class="elapsed-lbl" style="display:none;"></span>
       </button>
     </div>
   </div>
 
-  <!-- Right: results -->
-  <div class="right" id="rightPanel">
-    <!-- Placeholder -->
-    <div class="placeholder" id="placeholder">
-      <div class="ph-graphic">&#128221;</div>
-      <div class="ph-title">No results yet</div>
-      <div class="ph-sub">Record or upload an audio file, then click <strong>Run Pipeline</strong> to transcribe and summarize.</div>
+  <!-- Right panel -->
+  <div class="right">
+
+    <!-- Always-visible tab bar -->
+    <div class="global-tabs">
+      <button class="gtab active" data-gtab="script">
+        &#128218; Script
+      </button>
+      <button class="gtab locked" data-gtab="transcript" id="tabTranscript">
+        Transcript <span class="gtab-badge" id="uttBadge" style="display:none;"></span>
+      </button>
+      <button class="gtab locked" data-gtab="summary" id="tabSummary">
+        AI Summary <span class="gtab-badge" id="sumBadge" style="display:none;"></span>
+      </button>
     </div>
 
-    <!-- Results (hidden until first run) -->
-    <div class="results-area" id="resultsArea" style="display:none;">
-      <!-- Stats bar -->
-      <div class="stats-bar" id="statsBar"></div>
+    <!-- Stats bar (hidden until after run) -->
+    <div class="stats-bar" id="statsBar" style="display:none;"></div>
 
-      <!-- Tab bar -->
-      <div class="result-tabs">
-        <button class="rtab active" data-rtab="transcript">
-          Transcript <span class="rtab-badge" id="uttCount">0</span>
-        </button>
-        <button class="rtab" data-rtab="summary">
-          AI Summary <span class="rtab-badge" id="sumBadge"></span>
-        </button>
+    <!-- Pane container -->
+    <div class="pane-wrap">
+
+      <!-- Script pane -->
+      <div class="gpane active" id="gpane-script">
+        <div class="script-header">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#334155;">Reading Script</div>
+            <div class="script-meta" style="margin-top:2px;">Read these lines aloud to test the pipeline</div>
+          </div>
+        </div>
+        <div class="script-role-legend">
+          <div class="role-chip">
+            <div class="role-swatch" style="background:#4F46E5;"></div>
+            spk0 &mdash; Health Worker
+          </div>
+          <div class="role-chip">
+            <div class="role-swatch" style="background:#64748B;"></div>
+            spk1 &mdash; Patient
+          </div>
+        </div>
+        <div class="script-lines" id="scriptLines">
+          <div style="color:#94A3B8;font-size:13px;padding:20px 0;">Loading script&hellip;</div>
+        </div>
       </div>
 
       <!-- Transcript pane -->
-      <div class="rtab-pane active" id="rpane-transcript">
-        <div class="spk-legend" id="spkLegend"></div>
-        <div class="utterances" id="utterances"></div>
+      <div class="gpane" id="gpane-transcript">
+        <div class="trans-wrap">
+          <div class="pane-placeholder" id="transPlaceholder">
+            <div class="ph-ico">&#128221;</div>
+            <p>Run the pipeline to see the<br>diarized transcript here.</p>
+          </div>
+          <div id="transContent" style="display:none;">
+            <div class="spk-legend" id="spkLegend"></div>
+            <div class="utterances" id="utterances"></div>
+          </div>
+          <div id="transErr" style="display:none;"></div>
+        </div>
       </div>
 
       <!-- Summary pane -->
-      <div class="rtab-pane" id="rpane-summary">
-        <div class="summary-loading-state" id="sumLoading">
-          <div class="summary-spinner"></div>
-          <div class="summary-loading-label">Generating summary&hellip;</div>
-          <div class="summary-loading-sub">Llama-3.2-3B-Instruct is analyzing the transcript</div>
+      <div class="gpane" id="gpane-summary">
+        <div class="sum-wrap">
+          <div class="pane-placeholder" id="sumPlaceholder">
+            <div class="ph-ico">&#129302;</div>
+            <p>Run the pipeline to generate<br>an AI summary of the conversation.</p>
+          </div>
+          <div class="sum-loading" id="sumLoading" style="display:none;">
+            <div class="sum-spinner"></div>
+            <div class="sum-loading-lbl">Generating summary&hellip;</div>
+            <div class="sum-loading-sub">Llama-3.2-3B-Instruct is analyzing the transcript</div>
+          </div>
+          <div id="sumContent" style="display:none;"></div>
+          <div id="sumErr" style="display:none;"></div>
         </div>
-        <div id="sumContent" style="display:none;"></div>
       </div>
-    </div>
 
-    <!-- Error overlay -->
-    <div id="errArea" style="display:none; padding:24px;"></div>
-  </div>
-</div>
+    </div><!-- /pane-wrap -->
+  </div><!-- /right -->
+</div><!-- /layout -->
 
 <script>
-// ─── Speaker palette ──────────────────────────────────────
+// ─── Palette ──────────────────────────────────────────────
 const PALETTE = [
   { fg:'#2563EB', bg:'#EFF6FF', bd:'#BFDBFE' },
   { fg:'#DC2626', bg:'#FFF1F2', bd:'#FECACA' },
@@ -625,7 +594,93 @@ let audioCtx, mediaStream, processor, silentGain;
 let audioChunks  = [];
 let timerSecs    = 0;
 let timerID      = null;
-let elapsedID    = null;
+
+// ─── Load script on page load ─────────────────────────────
+(async () => {
+  try {
+    const resp = await fetch('/script');
+    const data = await resp.json();
+    if (data.status !== 'ok') throw new Error(data.detail);
+    renderScript(data.lines);
+  } catch (e) {
+    document.getElementById('scriptLines').innerHTML =
+      `<div class="err-card"><strong>Could not load script:</strong> ${esc(e.message)}</div>`;
+  }
+})();
+
+function renderScript(lines) {
+  const ROLES = { spk0: 'Health Worker', spk1: 'Patient' };
+  document.getElementById('scriptLines').innerHTML = lines.map((l, i) => {
+    const isSpk0 = l.speaker === 'spk0';
+    const roleLabel = ROLES[l.speaker] || l.speaker;
+    const numSide = isSpk0
+      ? `<div class="line-num" style="order:2;">#${i+1}</div>`
+      : `<div class="line-num" style="order:0;">#${i+1}</div>`;
+    return `<div class="script-turn ${esc(l.speaker)}">
+      ${numSide}
+      <div class="bubble">
+        <div class="bubble-spk">${esc(roleLabel)}</div>
+        <div class="bubble-text">${esc(l.text)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Global tab switching ─────────────────────────────────
+document.querySelectorAll('.gtab:not(.locked)').forEach(t => {
+  t.addEventListener('click', () => switchGTab(t.dataset.gtab));
+});
+
+function switchGTab(name) {
+  document.querySelectorAll('.gtab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.gpane').forEach(x => x.classList.remove('active'));
+  const tab  = document.querySelector(`.gtab[data-gtab="${name}"]`);
+  const pane = document.getElementById(`gpane-${name}`);
+  if (tab)  tab.classList.add('active');
+  if (pane) pane.classList.add('active');
+}
+
+function unlockTab(name) {
+  const t = document.querySelector(`.gtab[data-gtab="${name}"]`);
+  if (t) {
+    t.classList.remove('locked');
+    t.addEventListener('click', () => switchGTab(t.dataset.gtab));
+  }
+}
+
+// ─── Microphone permission probe ──────────────────────────
+async function probeMic() {
+  const warn    = document.getElementById('micWarning');
+  const warnTxt = document.getElementById('micWarningText');
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    const isHttp = location.protocol === 'http:' && location.hostname !== 'localhost';
+    warnTxt.innerHTML = isHttp
+      ? 'Browsers block microphone access on plain HTTP. Ask your administrator to enable HTTPS, '
+        + 'or open this page via an SSH tunnel on <code>localhost</code>.'
+      : 'Your browser does not support microphone access.';
+    warn.style.display = 'block';
+    document.getElementById('micBtn').disabled = true;
+    return;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    stream.getTracks().forEach(t => t.stop()); // release immediately — just wanted the prompt
+    warn.style.display = 'none';
+    document.getElementById('micBtn').disabled = false;
+  } catch (e) {
+    warn.style.display = 'block';
+    document.getElementById('micBtn').disabled = true;
+    if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+      warnTxt.textContent = 'Permission denied. Click the lock/info icon in your browser\'s address bar and allow microphone access, then reload.';
+    } else if (e.name === 'NotFoundError') {
+      warnTxt.textContent = 'No microphone found. Please connect a microphone and try again.';
+    } else {
+      warnTxt.textContent = `Microphone error: ${e.message}`;
+    }
+  }
+}
 
 // ─── Input tab switching ──────────────────────────────────
 document.querySelectorAll('.itab').forEach(t =>
@@ -635,19 +690,13 @@ document.querySelectorAll('.itab').forEach(t =>
     document.querySelectorAll('.itab-pane').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
     document.getElementById('pane-' + activeTab).classList.add('active');
+    if (activeTab === 'record') probeMic();
     syncBtn();
   })
 );
 
-// ─── Result tab switching ─────────────────────────────────
-document.querySelectorAll('.rtab').forEach(t =>
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.rtab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.rtab-pane').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('rpane-' + t.dataset.rtab).classList.add('active');
-  })
-);
+// Probe on initial load since Record tab is active by default
+probeMic();
 
 // ─── Recording ────────────────────────────────────────────
 const micRing      = document.getElementById('micRing');
@@ -659,98 +708,70 @@ const audioPreview = document.getElementById('audioPreview');
 micBtn.addEventListener('click', () => isRecording ? stopRec() : startRec());
 
 async function startRec() {
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-  } catch {
-    alert('Microphone access was denied.\nPlease allow microphone permissions and try again.');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    await probeMic(); // will show the inline warning
     return;
   }
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+  } catch (e) {
+    await probeMic(); // updates the inline warning with the specific error
+    return;
+  }
+  audioCtx = new AudioContext(); audioChunks = [];
+  const src  = audioCtx.createMediaStreamSource(mediaStream);
+  processor  = audioCtx.createScriptProcessor(4096, 1, 1);
+  silentGain = audioCtx.createGain(); silentGain.gain.value = 0;
+  processor.onaudioprocess = e => { if (isRecording) audioChunks.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+  src.connect(processor); processor.connect(silentGain); silentGain.connect(audioCtx.destination);
 
-  audioCtx    = new AudioContext();
-  audioChunks = [];
-  const src   = audioCtx.createMediaStreamSource(mediaStream);
-  processor   = audioCtx.createScriptProcessor(4096, 1, 1);
-  silentGain  = audioCtx.createGain();
-  silentGain.gain.value = 0;
-
-  processor.onaudioprocess = e => {
-    if (isRecording) audioChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
-  };
-  src.connect(processor);
-  processor.connect(silentGain);
-  silentGain.connect(audioCtx.destination);
-
-  isRecording  = true;
-  recordedBlob = null;
+  isRecording = true; recordedBlob = null;
   audioPreview.classList.remove('visible');
-
   micRing.classList.add('recording');
-  micBtn.className   = 'mic-btn recording';
-  micBtn.textContent = '\u23F9';
-  recStatus.className   = 'rec-label live';
-  recStatus.textContent = 'Recording\u2026';
+  micBtn.className = 'mic-btn recording'; micBtn.textContent = '\u23F9';
+  recStatus.className = 'rec-label live'; recStatus.textContent = 'Recording\u2026';
   recTimer.classList.add('visible');
-
-  timerSecs = 0;
-  recTimer.textContent = fmtTimer(0);
+  timerSecs = 0; recTimer.textContent = fmtTimer(0);
   timerID = setInterval(() => { timerSecs++; recTimer.textContent = fmtTimer(timerSecs); }, 1000);
 }
 
 async function stopRec() {
-  isRecording = false;
-  clearInterval(timerID);
-
-  processor.disconnect();
-  mediaStream.getTracks().forEach(t => t.stop());
+  isRecording = false; clearInterval(timerID);
+  processor.disconnect(); mediaStream.getTracks().forEach(t => t.stop());
   await audioCtx.close();
 
-  const total  = audioChunks.reduce((s, c) => s + c.length, 0);
+  const total = audioChunks.reduce((s, c) => s + c.length, 0);
   const merged = new Float32Array(total);
-  let off = 0;
-  for (const c of audioChunks) { merged.set(c, off); off += c.length; }
+  let off = 0; for (const c of audioChunks) { merged.set(c, off); off += c.length; }
 
   recordedBlob = toWavBlob(merged, audioCtx.sampleRate);
   audioPreview.src = URL.createObjectURL(recordedBlob);
   audioPreview.classList.add('visible');
-
   micRing.classList.remove('recording');
-  micBtn.className    = 'mic-btn idle';
-  micBtn.textContent  = '\u{1F399}';
-  recStatus.className   = 'rec-label';
-  recStatus.textContent = `Recorded ${fmtTimer(timerSecs)} \u2014 ready`;
-
+  micBtn.className = 'mic-btn idle'; micBtn.textContent = '\u{1F399}';
+  recStatus.className = 'rec-label'; recStatus.textContent = `Recorded ${fmtTimer(timerSecs)} \u2014 ready`;
   syncBtn();
 }
 
-function fmtTimer(s) {
-  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
-}
+function fmtTimer(s) { return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
 
-// ─── WAV encoder ──────────────────────────────────────────
 function toWavBlob(samples, sr) {
   const dLen = samples.length * 2;
-  const buf  = new ArrayBuffer(44 + dLen);
-  const v    = new DataView(buf);
-  const s    = (o, x) => { for (let i = 0; i < x.length; i++) v.setUint8(o + i, x.charCodeAt(i)); };
-
-  s(0, 'RIFF'); v.setUint32(4, 36 + dLen, true);
-  s(8, 'WAVE'); s(12, 'fmt ');
-  v.setUint32(16, 16, true); v.setUint16(20, 1, true);
-  v.setUint16(22, 1, true);  v.setUint32(24, sr, true);
-  v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true);
-  v.setUint16(34, 16, true);
-  s(36, 'data'); v.setUint32(40, dLen, true);
-
+  const buf = new ArrayBuffer(44 + dLen); const v = new DataView(buf);
+  const s = (o, x) => { for (let i=0;i<x.length;i++) v.setUint8(o+i,x.charCodeAt(i)); };
+  s(0,'RIFF'); v.setUint32(4,36+dLen,true); s(8,'WAVE'); s(12,'fmt ');
+  v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true);
+  v.setUint32(24,sr,true); v.setUint32(28,sr*2,true); v.setUint16(32,2,true); v.setUint16(34,16,true);
+  s(36,'data'); v.setUint32(40,dLen,true);
   let o = 44;
-  for (let i = 0; i < samples.length; i++) {
-    const x = Math.max(-1, Math.min(1, samples[i]));
-    v.setInt16(o, x < 0 ? x * 32768 : x * 32767, true);
-    o += 2;
+  for (let i=0;i<samples.length;i++) {
+    const x = Math.max(-1,Math.min(1,samples[i]));
+    v.setInt16(o, x<0?x*32768:x*32767, true); o+=2;
   }
-  return new Blob([buf], { type: 'audio/wav' });
+  return new Blob([buf],{type:'audio/wav'});
 }
 
-// ─── File upload ──────────────────────────────────────────
+// ─── Upload ───────────────────────────────────────────────
 const dropZone   = document.getElementById('dropZone');
 const fileInput  = document.getElementById('fileInput');
 const fileBadge  = document.getElementById('fileBadge');
@@ -764,139 +785,95 @@ dropZone.addEventListener('drop', e => {
   e.preventDefault(); dropZone.classList.remove('over');
   if (e.dataTransfer.files[0]) pickFile(e.dataTransfer.files[0]);
 });
+function pickFile(f) { uploadedFile=f; fileNameEl.textContent=f.name; fileBadge.classList.add('visible'); syncBtn(); }
 
-function pickFile(f) {
-  uploadedFile = f;
-  fileNameEl.textContent = f.name;
-  fileBadge.classList.add('visible');
-  syncBtn();
-}
-
-// ─── Button state ─────────────────────────────────────────
 function syncBtn() {
-  const ready = (activeTab === 'record' && recordedBlob) ||
-                (activeTab === 'upload' && uploadedFile);
+  const ready = (activeTab==='record' && recordedBlob) || (activeTab==='upload' && uploadedFile);
   document.getElementById('btnGo').disabled = !ready;
 }
 
 // ─── Run pipeline ─────────────────────────────────────────
 document.getElementById('btnGo').addEventListener('click', async () => {
-  const blob = activeTab === 'record' ? recordedBlob : uploadedFile;
+  const blob = activeTab==='record' ? recordedBlob : uploadedFile;
   if (!blob) return;
 
-  const btn     = document.getElementById('btnGo');
+  const btn = document.getElementById('btnGo');
   const btnIcon = document.getElementById('btnIcon');
-  const btnLabel= document.getElementById('btnLabel');
-  const btnElap = document.getElementById('btnElapsed');
+  const btnLabel = document.getElementById('btnLabel');
+  const btnElapsed = document.getElementById('btnElapsed');
 
   btn.disabled = true;
   btnIcon.innerHTML = '<span class="spinner-white"></span>';
   btnLabel.textContent = 'Transcribing\u2026';
-  btnElap.style.display = 'inline';
-  btnElap.textContent = '0:00';
+  btnElapsed.style.display = 'inline';
+  btnElapsed.textContent = '0:00';
 
   let eSecs = 0;
-  elapsedID = setInterval(() => {
-    eSecs++;
-    btnElap.textContent = fmtTimer(eSecs);
-  }, 1000);
+  const elapsedID = setInterval(() => { eSecs++; btnElapsed.textContent = fmtTimer(eSecs); }, 1000);
 
-  const fd   = new FormData();
-  const name = activeTab === 'upload' ? (uploadedFile.name || 'audio.wav') : 'recording.wav';
+  // Reset transcript/summary panes
+  document.getElementById('transPlaceholder').style.display = 'flex';
+  document.getElementById('transContent').style.display = 'none';
+  document.getElementById('transErr').style.display = 'none';
+  document.getElementById('sumPlaceholder').style.display = 'flex';
+  document.getElementById('sumLoading').style.display = 'none';
+  document.getElementById('sumContent').style.display = 'none';
+  document.getElementById('sumErr').style.display = 'none';
+  document.getElementById('statsBar').style.display = 'none';
+  const uttBadge = document.getElementById('uttBadge');
+  const sumBadge = document.getElementById('sumBadge');
+  uttBadge.style.display = 'none';
+  sumBadge.style.display = 'none';
+
+  const fd = new FormData();
+  const name = activeTab==='upload' ? (uploadedFile.name||'audio.wav') : 'recording.wav';
   fd.append('audio', blob, name);
 
-  // Reset result panels
-  showPlaceholder(false);
-  document.getElementById('errArea').style.display = 'none';
-  document.getElementById('resultsArea').style.display = 'none';
-
   try {
-    const resp = await fetch('/transcribe', { method: 'POST', body: fd });
+    const resp = await fetch('/transcribe', { method:'POST', body:fd });
     const raw  = await resp.text();
     let data;
     try { data = JSON.parse(raw); }
-    catch {
-      showErr(`Server returned non-JSON (HTTP ${resp.status}).<pre style="font-size:11px;margin-top:8px;overflow:auto;">${esc(raw.slice(0, 500))}</pre>`);
-      return;
-    }
+    catch { showTransErr(`Server returned non-JSON (HTTP ${resp.status}).<pre style="font-size:11px;margin-top:8px;">${esc(raw.slice(0,500))}</pre>`); return; }
 
-    if (data.status !== 'ok') { showErr(data.detail || data.message || 'Unknown error'); return; }
+    if (data.status !== 'ok') { showTransErr(data.detail || 'Unknown error'); return; }
 
     renderTranscript(data.transcript);
 
-    // Kick off summarization asynchronously
+    // Kick off summarization
     const plainText = data.transcript.map(t => `[Speaker ${t.speaker}]: ${t.text}`).join('\n');
     triggerSummarize(plainText);
 
-  } catch (e) {
-    showErr(e.message);
+  } catch(e) {
+    showTransErr(e.message);
   } finally {
     clearInterval(elapsedID);
     btn.disabled = false;
     btnIcon.textContent = '\u25B6';
     btnLabel.textContent = 'Run Pipeline';
-    btnElap.style.display = 'none';
+    btnElapsed.style.display = 'none';
     syncBtn();
   }
 });
 
-// ─── Summarize (async, non-blocking) ─────────────────────
-async function triggerSummarize(text) {
-  // Show loading badge on Summary tab
-  const badge = document.getElementById('sumBadge');
-  badge.className = 'rtab-badge loading';
-  badge.textContent = '';
-
-  document.getElementById('sumLoading').style.display = 'flex';
-  document.getElementById('sumContent').style.display = 'none';
-
-  try {
-    const resp = await fetch('/summarize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text }),
-    });
-    const data = await resp.json();
-
-    badge.className = 'rtab-badge';
-
-    if (data.status === 'ok') {
-      badge.textContent = '\u2713';
-      renderSummary(data.summary);
-    } else {
-      badge.textContent = '!';
-      badge.style.background = '#FEE2E2';
-      badge.style.color = '#DC2626';
-      renderSummaryErr(data.detail || 'Summarization failed.');
-    }
-  } catch (e) {
-    badge.className = 'rtab-badge';
-    badge.textContent = '!';
-    renderSummaryErr(e.message);
-  }
-}
-
 // ─── Render transcript ────────────────────────────────────
 function renderTranscript(tr) {
-  if (!tr || !tr.length) {
-    showErr('No speech detected in the audio.');
-    return;
-  }
+  if (!tr || !tr.length) { showTransErr('No speech detected in the audio.'); return; }
 
   const speakers = [...new Set(tr.map(t => t.speaker))].sort();
-  const cmap     = {};
-  speakers.forEach((s, i) => { cmap[s] = PALETTE[i % PALETTE.length]; });
-  const total    = Math.max(...tr.map(t => t.end));
+  const cmap = {}; speakers.forEach((s,i) => { cmap[s] = PALETTE[i % PALETTE.length]; });
+  const total = Math.max(...tr.map(t => t.end));
 
   // Stats
-  document.getElementById('statsBar').innerHTML =
-    statItem('Duration',   ft(total)) +
-    statItem('Speakers',   speakers.length) +
-    statItem('Utterances', tr.length);
+  const sb = document.getElementById('statsBar');
+  sb.innerHTML = si('Duration', ft(total)) + si('Speakers', speakers.length) + si('Utterances', tr.length);
+  sb.style.display = 'flex';
 
-  document.getElementById('uttCount').textContent = tr.length;
+  // Badge
+  const uttBadge = document.getElementById('uttBadge');
+  uttBadge.textContent = tr.length; uttBadge.style.display = 'inline-flex';
 
-  // Speaker legend
+  // Legend
   document.getElementById('spkLegend').innerHTML = speakers.map(s => {
     const c = cmap[s];
     return `<div class="spk-chip" style="background:${c.bg};border:1px solid ${c.bd};">
@@ -918,74 +895,87 @@ function renderTranscript(tr) {
     </div>`;
   }).join('');
 
-  // Show results; activate Transcript tab
-  showPlaceholder(false);
-  document.getElementById('errArea').style.display = 'none';
-  document.getElementById('resultsArea').style.display = 'flex';
+  document.getElementById('transPlaceholder').style.display = 'none';
+  document.getElementById('transContent').style.display = 'block';
 
-  document.querySelectorAll('.rtab').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.rtab-pane').forEach(x => x.classList.remove('active'));
-  document.querySelector('[data-rtab="transcript"]').classList.add('active');
-  document.getElementById('rpane-transcript').classList.add('active');
-
-  document.getElementById('rpane-transcript').scrollTop = 0;
+  unlockTab('transcript');
+  switchGTab('transcript');
+  document.getElementById('gpane-transcript').scrollTop = 0;
 }
 
-function statItem(label, val) {
-  return `<div class="stat-item">
-    <div class="stat-lbl">${label}</div>
-    <div class="stat-num">${val}</div>
-  </div>`;
+function si(label, val) {
+  return `<div class="stat-item"><div class="stat-lbl">${label}</div><div class="stat-num">${val}</div></div>`;
 }
 
-// ─── Render summary ───────────────────────────────────────
+function showTransErr(msg) {
+  unlockTab('transcript');
+  switchGTab('transcript');
+  document.getElementById('transPlaceholder').style.display = 'none';
+  document.getElementById('transErr').style.display = 'block';
+  document.getElementById('transErr').innerHTML = `<div class="err-card"><strong>Error:</strong> ${msg}</div>`;
+}
+
+// ─── Summarize ────────────────────────────────────────────
+async function triggerSummarize(text) {
+  unlockTab('summary');
+
+  const sumBadge = document.getElementById('sumBadge');
+  sumBadge.className = 'gtab-badge spin'; sumBadge.textContent = ''; sumBadge.style.display = 'inline-flex';
+  document.getElementById('sumPlaceholder').style.display = 'none';
+  document.getElementById('sumLoading').style.display = 'flex';
+
+  try {
+    const resp = await fetch('/summarize', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text }),
+    });
+    const data = await resp.json();
+    sumBadge.className = 'gtab-badge';
+
+    if (data.status === 'ok') {
+      sumBadge.textContent = '\u2713';
+      renderSummary(data.summary);
+    } else {
+      sumBadge.textContent = '!'; sumBadge.style.background = '#FEE2E2'; sumBadge.style.color = '#DC2626';
+      showSumErr(data.detail || 'Summarization failed.');
+    }
+  } catch(e) {
+    sumBadge.className = 'gtab-badge'; sumBadge.textContent = '!';
+    showSumErr(e.message);
+  }
+}
+
 function renderSummary(text) {
   const wordCount = text.trim().split(/\s+/).length;
   document.getElementById('sumLoading').style.display = 'none';
   document.getElementById('sumContent').style.display = 'block';
   document.getElementById('sumContent').innerHTML = `
-    <div class="summary-card">
-      <div class="summary-card-header">
-        <div class="summary-card-title">Conversation Summary</div>
-        <div class="summary-model-tag">meta-llama/Llama-3.2-3B-Instruct</div>
+    <div class="sum-card">
+      <div class="sum-card-hdr">
+        <div class="sum-card-title">Conversation Summary</div>
+        <div class="sum-model-tag">meta-llama/Llama-3.2-3B-Instruct</div>
       </div>
-      <div class="summary-body">${esc(text)}</div>
-      <div class="summary-footer">
+      <div class="sum-body">${esc(text)}</div>
+      <div class="sum-footer">
         <span>${wordCount} words</span>
         <span>Generated ${new Date().toLocaleTimeString()}</span>
       </div>
     </div>`;
 }
 
-function renderSummaryErr(msg) {
+function showSumErr(msg) {
   document.getElementById('sumLoading').style.display = 'none';
-  document.getElementById('sumContent').style.display = 'block';
-  document.getElementById('sumContent').innerHTML =
-    `<div class="err-card"><strong>Summarization error:</strong> ${esc(msg)}</div>`;
+  document.getElementById('sumErr').style.display = 'block';
+  document.getElementById('sumErr').innerHTML = `<div class="err-card"><strong>Summarization error:</strong> ${esc(msg)}</div>`;
 }
 
 // ─── Helpers ──────────────────────────────────────────────
-function showPlaceholder(show) {
-  document.getElementById('placeholder').style.display = show ? 'flex' : 'none';
-}
-
-function showErr(msg) {
-  showPlaceholder(false);
-  document.getElementById('resultsArea').style.display = 'none';
-  const el = document.getElementById('errArea');
-  el.style.display = 'block';
-  el.innerHTML = `<div class="err-card"><strong>Error:</strong> ${msg}</div>`;
-}
-
 function ft(s) {
-  const m   = Math.floor(s / 60);
-  const sec = (s % 60).toFixed(1);
-  return m > 0 ? `${m}:${String(Math.floor(s % 60)).padStart(2, '0')}` : `${sec}s`;
+  const m = Math.floor(s/60); const sec = (s%60).toFixed(1);
+  return m > 0 ? `${m}:${String(Math.floor(s%60)).padStart(2,'0')}` : `${sec}s`;
 }
-
 function esc(str) {
-  return String(str)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 </script>
 </body>
