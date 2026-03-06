@@ -1,5 +1,14 @@
-import torch
 import os
+
+os.environ["PYTORCH_NVFUSER_DISABLE"] = "1"
+os.environ["PYTORCH_JIT_USE_NNC_NOT_NVFUSER"] = "1"
+
+import torch
+
+torch._C._jit_set_nvfuser_enabled(False)
+torch._C._jit_override_can_fuse_on_gpu(False)
+torch._C._jit_set_texpr_fuser_enabled(True)
+
 import soundfile as sf
 from scipy.signal import resample_poly
 from dotenv import load_dotenv
