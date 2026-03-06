@@ -28,9 +28,9 @@ SUMMARIZATION_CONFIG = {
         "gt_summary": "gt_summary",
     },
     "model": {
-        "name": "openai/gpt-oss-20b",
-        "fallback_name": "Qwen/Qwen2.5-7B-Instruct",
-        "torch_dtype": "auto",
+        "name": "meta-llama/Llama-3.1-8B-Instruct",
+        "fallback_name": "meta-llama/Llama-3.2-3B-Instruct",
+        "torch_dtype": "float16",
         "device": "cuda",
         "device_map": "auto",
         "hf_token": "",
@@ -175,7 +175,7 @@ pipeline = DiCoIndicPipeline(
 )
 
 # -------------------------------
-# Summarization Model (GPT-OSS-20B)
+# Summarization Model (Llama)
 # -------------------------------
 
 print(f"Loading summarization model ({SUMMARIZATION_CONFIG['model']['name']})...")
@@ -207,9 +207,14 @@ try:
 except Exception as e:
     err = str(e)
     fallback_name = SUMMARIZATION_CONFIG["model"].get("fallback_name")
-    if fallback_name and ("torch.accelerator" in err or "quantizer_mxfp4" in err):
+    if fallback_name and (
+        "torch.accelerator" in err
+        or "quantizer_mxfp4" in err
+        or "has no attribute 'accelerator'" in err
+        or "out of memory" in err.lower()
+    ):
         print(
-            "GPT-OSS load failed due to local torch/transformers compatibility "
+            "Primary summarization model load failed "
             f"({err}). Falling back to {fallback_name}."
         )
         sum_tokenizer, sum_model = _load_summarization_stack(
