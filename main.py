@@ -125,6 +125,12 @@ class DiCoIndicPipeline:
             if len(segment) == 0:
                 continue
 
+            # Skip segments shorter than ~0.1s — RNNT decoder can fail
+            # with "batch_outputs referenced before assignment" on tiny inputs
+            min_samples = int(0.1 * target_sr)
+            if len(segment) < min_samples:
+                continue
+
             waveform = torch.from_numpy(segment).unsqueeze(0).to(self.device)
 
             min_length = 512
@@ -132,8 +138,12 @@ class DiCoIndicPipeline:
                 padding = min_length - waveform.shape[1]
                 waveform = torch.nn.functional.pad(waveform, (0, padding))
 
-            with torch.no_grad():
-                transcription = self.asr_model(waveform, "hi", "rnnt")
+            try:
+                with torch.no_grad():
+                    transcription = self.asr_model(waveform, "hi", "rnnt")
+            except UnboundLocalError:
+                # RNNT decoder may fail on very short/silent segments
+                continue
 
             transcription_text = (
                 transcription[0]
